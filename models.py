@@ -13,7 +13,7 @@ class AlexNet(nn.Module):
             nn.Conv2d(384, 256, kernel_size=3, padding=1), nn.ReLU(),
             nn.MaxPool2d(kernel_size=3, stride=2),
             nn.Flatten(),
-            nn.Linear(6400, 4096), nn.ReLU(), # in_features depends on the size of the input image (make it 64x64)
+            nn.Linear(1024, 4096), nn.ReLU(), # made for 128x128 input images
             nn.Dropout(p=0.5),
             nn.Linear(4096, 4096), nn.ReLU(),
             nn.Dropout(p=0.5),
@@ -21,6 +21,8 @@ class AlexNet(nn.Module):
 
     def forward(self, x):
         return self.net(x)
+
+
 
 class VGG11(nn.Module):
     def __init__(self, in_channels=3, num_classes=1000):
@@ -34,7 +36,7 @@ class VGG11(nn.Module):
 
         self.net = nn.Sequential(
             *conv_blks, nn.Flatten(),
-            nn.Linear(conv_arch[-1][1] * 7 * 7, 4096), nn.ReLU(), nn.Dropout(0.5), # change in_channels for 64x64 images
+            nn.Linear(conv_arch[-1][1] * 4 * 4, 4096), nn.ReLU(), nn.Dropout(0.5), # made for 128x128 input images
             nn.Linear(4096, 4096), nn.ReLU(), nn.Dropout(0.5),
             nn.Linear(4096, num_classes))
 
@@ -51,11 +53,13 @@ class VGG11(nn.Module):
         layers.append(nn.MaxPool2d(kernel_size=2, stride=2))
         return nn.Sequential(*layers)
 
+
+
 class ResNet18(nn.Module):
     def __init__(self, in_channels=3, num_classes=1000):
         super(ResNet18, self).__init__()
 
-        b1 = nn.Sequential(nn.Conv2d(1, 64, kernel_size=7, stride=2, padding=3),
+        b1 = nn.Sequential(nn.Conv2d(in_channels, 64, kernel_size=7, stride=2, padding=3),
                            nn.BatchNorm2d(64), nn.ReLU(),
                            nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
         b2 = nn.Sequential(*self.resnet_block(64, 64, 2, first_block=True))
@@ -65,7 +69,7 @@ class ResNet18(nn.Module):
 
         self.net = nn.Sequential(b1, b2, b3, b4, b5,
                             nn.AdaptiveAvgPool2d((1, 1)),
-                            nn.Flatten(), nn.Linear(512, 10))
+                            nn.Flatten(), nn.Linear(512, num_classes))
 
     def forward(self, x):
         return self.net(x)

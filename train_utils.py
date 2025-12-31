@@ -2,6 +2,7 @@ from torchvision import datasets, transforms
 from torch.utils.data import DataLoader
 import torch
 from torch import nn
+import time
 
 def load_data_tiny_imagenet(batch_size=128):
     """Load the tiny imagenet dataset."""
@@ -19,7 +20,8 @@ def load_data_tiny_imagenet(batch_size=128):
 
     transform_train = transforms.Compose(transform_train)
 
-    transform_val = [transforms.ToTensor(),
+    transform_val = [transforms.Resize(128),
+                     transforms.ToTensor(),
                      normalize]
 
     transform_val = transforms.Compose(transform_val)
@@ -27,8 +29,8 @@ def load_data_tiny_imagenet(batch_size=128):
     imagenet_train = datasets.ImageFolder("../data/tiny-imagenet-200/train", transform=transform_train)
     imagenet_val = datasets.ImageFolder("../data/tiny-imagenet-200/val", transform=transform_val)
 
-    train_loader = DataLoader(imagenet_train, batch_size=batch_size, shuffle=True)
-    val_loader = DataLoader(imagenet_val, batch_size=batch_size, shuffle=True)
+    train_loader = DataLoader(imagenet_train, batch_size=batch_size, shuffle=True, num_workers=4)
+    val_loader = DataLoader(imagenet_val, batch_size=batch_size, shuffle=True, num_workers=4)
 
     return train_loader, val_loader
 
@@ -47,8 +49,9 @@ def evaluate_accuracy(net, data_iter, loss, device):
 
             with torch.no_grad():
                 total_loss += float(l)
-                total_hits += sum([net(X).argmax(axis=1).type(y.dtype) == y])
+                total_hits += (y_hat.argmax(axis=1).type(y.dtype) == y).sum()
                 total_samples += y.numel()
+
     return float(total_loss) / len(data_iter), float(total_hits) / total_samples  * 100
 
 def train_epoch(net, train_iter, loss, optimizer, device):
@@ -73,8 +76,9 @@ def train_epoch(net, train_iter, loss, optimizer, device):
 
         with torch.no_grad():
             total_loss += float(l)
-            total_hits += sum([y_hat.argmax(axis=1).type(y.dtype) == y])
+            total_hits += (y_hat.argmax(axis=1).type(y.dtype) == y).sum()
             total_samples += y.numel()
+
     # Return training loss and training accuracy
     return float(total_loss) / len(train_iter), float(total_hits) / total_samples  * 100
 
@@ -93,8 +97,9 @@ def train(net, train_iter, val_iter, num_epochs, patience, loss, optimizer, devi
             nn.init.xavier_uniform_(m.weight)
     net.apply(init_weights)
 
-    print('Training on', device)
     net.to(device)
+
+    start_time = time.time()
 
     for epoch in range(num_epochs):
         train_loss, train_acc = train_epoch(net, train_iter, loss, optimizer, device)
@@ -116,7 +121,9 @@ def train(net, train_iter, val_iter, num_epochs, patience, loss, optimizer, devi
         if(counter > patience):
             break
 
-    print(f'Best Validation Accuracy {best_val_accuracy:.2f}, Epoch: {val_acc_all.index(best_val_accuracy):.d}')
+    end_time = time.time()
+
+    print(f'Best Validation Accuracy {best_val_accuracy:.2f}, Epoch: {val_acc_all.index(best_val_accuracy) + 1}, Training Time: {end_time - start_time:.2f}s\n')
 
     return train_loss_all, train_acc_all, val_loss_all, val_acc_all
 

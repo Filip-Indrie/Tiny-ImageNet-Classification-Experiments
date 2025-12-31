@@ -12,7 +12,7 @@ def load_data_tiny_imagenet(batch_size=128):
         std=[0.229, 0.224, 0.225]
     )
 
-    transform_train = [transforms.RandomResizedCrop(64, scale=(0.6, 1.0)),
+    transform_train = [transforms.RandomResizedCrop(128, scale=(0.8, 1.0)),
                        transforms.RandomHorizontalFlip(),
                        transforms.ToTensor(),
                        normalize]

@@ -44,10 +44,11 @@ def evaluate_accuracy(net, data_iter, loss, device):
             X, y = X.to(device), y.to(device)
             y_hat = net(X)
             l = loss(y_hat, y)
-            l.detach()
-            total_loss += float(l)
-            total_hits += sum([net(X).argmax(axis=1).type(y.dtype) == y])
-            total_samples += y.numel()
+
+            with torch.no_grad():
+                total_loss += float(l)
+                total_hits += sum([net(X).argmax(axis=1).type(y.dtype) == y])
+                total_samples += y.numel()
     return float(total_loss) / len(data_iter), float(total_hits) / total_samples  * 100
 
 def train_epoch(net, train_iter, loss, optimizer, device):
@@ -70,14 +71,14 @@ def train_epoch(net, train_iter, loss, optimizer, device):
         l.backward()
         optimizer.step()
 
-        l.detach()
-        total_loss += float(l)
-        total_hits += sum([y_hat.argmax(axis=1).type(y.dtype) == y])
-        total_samples += y.numel()
+        with torch.no_grad():
+            total_loss += float(l)
+            total_hits += sum([y_hat.argmax(axis=1).type(y.dtype) == y])
+            total_samples += y.numel()
     # Return training loss and training accuracy
     return float(total_loss) / len(train_iter), float(total_hits) / total_samples  * 100
 
-def train(net, train_iter, val_iter, num_epochs, lr, patience, device):
+def train(net, train_iter, val_iter, num_epochs, patience, loss, optimizer, device):
     """Train a model."""
     train_loss_all = []
     train_acc_all = []
@@ -94,9 +95,6 @@ def train(net, train_iter, val_iter, num_epochs, lr, patience, device):
 
     print('Training on', device)
     net.to(device)
-
-    optimizer = torch.optim.SGD(net.parameters(), lr=lr)
-    loss = nn.CrossEntropyLoss()
 
     for epoch in range(num_epochs):
         train_loss, train_acc = train_epoch(net, train_iter, loss, optimizer, device)

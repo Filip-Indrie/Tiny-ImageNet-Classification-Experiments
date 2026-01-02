@@ -3,6 +3,9 @@ from torch.utils.data import DataLoader
 import torch
 from torch import nn
 import time
+from os import makedirs
+
+__all__ = ["load_data_tiny_imagenet", "init_weights", "evaluate_accuracy", "train_epoch", "train", "try_gpu"]
 
 def load_data_tiny_imagenet(batch_size=128):
     """Load the tiny imagenet dataset."""
@@ -71,9 +74,9 @@ def evaluate_accuracy(net, data_iter, loss, device):
     total_hits = 0
     total_samples = 0
     with torch.no_grad():
-        for X, y in data_iter:
-            X, y = X.to(device), y.to(device)
-            y_hat = net(X)
+        for x, y in data_iter:
+            x, y = x.to(device), y.to(device)
+            y_hat = net(x)
             l = loss(y_hat, y)
 
             with torch.no_grad():
@@ -92,10 +95,10 @@ def train_epoch(net, train_iter, loss, optimizer, device):
     total_hits = 0
     total_samples = 0
 
-    for X, y in train_iter:
+    for x, y in train_iter:
         # Compute gradients and update parameters
-        X, y = X.to(device), y.to(device)
-        y_hat = net(X)
+        x, y = x.to(device), y.to(device)
+        y_hat = net(x)
         l = loss(y_hat, y)
 
         # Using PyTorch built-in optimizer & loss criterion
@@ -125,9 +128,17 @@ def train(net, train_iter, val_iter, num_epochs, patience, loss, optimizer, weig
 
     net.to(device)
 
+    net_name = type(net).__name__
+    makedirs("Measurements", exist_ok=True)
+    stats_file = open("Measurements/" + net_name + '_stats.txt', 'w', encoding='utf-8')
+
+    stats_file.write(str(net) + "\n\n")
+
     start_time = time.time()
 
     for epoch in range(num_epochs):
+        print(f"Epoch {epoch + 1}")
+
         train_loss, train_acc = train_epoch(net, train_iter, loss, optimizer, device)
         train_loss_all.append(train_loss)
         train_acc_all.append(train_acc)
@@ -136,20 +147,22 @@ def train(net, train_iter, val_iter, num_epochs, patience, loss, optimizer, weig
         val_loss_all.append(val_loss)
         val_acc_all.append(val_acc)
 
-        print(f'Epoch {epoch + 1}, Train loss {train_loss:.2f}, Train accuracy {train_acc:.2f}, Validation loss {val_loss:.2f}, Validation accuracy {val_acc:.2f}')
+        stats_file.write(f'Epoch {epoch + 1}, Train loss {train_loss:.2f}, Train accuracy {train_acc:.2f}, Validation loss {val_loss:.2f}, Validation accuracy {val_acc:.2f}\n')
 
-        if(val_acc > best_val_accuracy):
+        if val_acc > best_val_accuracy:
             best_val_accuracy = val_acc
             counter = 0
         else:
             counter += 1
 
-        if(counter > patience):
+        if counter > patience:
             break
 
     end_time = time.time()
 
-    print(f'Best Validation Accuracy {best_val_accuracy:.2f}, Epoch: {val_acc_all.index(best_val_accuracy) + 1}, Training Time: {end_time - start_time:.2f}s\n')
+    stats_file.write(f'\nBest Validation Accuracy {best_val_accuracy:.2f}, Epoch: {val_acc_all.index(best_val_accuracy) + 1}, Training Time: {end_time - start_time:.2f}s\n')
+
+    stats_file.close()
 
     return train_loss_all, train_acc_all, val_loss_all, val_acc_all
 

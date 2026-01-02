@@ -2,6 +2,8 @@ from torch import nn
 from torchinfo import summary
 from abc import ABC
 
+__all__ = ["AlexNet", "VGG11", "ResNet18"]
+
 class CustomModel(nn.Module, ABC):
     """
         Abstract class designed to ease the implementation
@@ -22,10 +24,10 @@ class CustomModel(nn.Module, ABC):
 
 
 class AlexNet(CustomModel):
-    def __init__(self, in_channels=3, num_classes=1000):
+    def __init__(self):
         super(AlexNet, self).__init__()
         self._net = nn.Sequential(
-            nn.Conv2d(in_channels, 96, kernel_size=11, stride=4, padding=1), nn.ReLU(),
+            nn.Conv2d(3, 96, kernel_size=11, stride=4, padding=1), nn.ReLU(),
             nn.MaxPool2d(kernel_size=3, stride=2),
             nn.Conv2d(96, 256, kernel_size=5, padding=2), nn.ReLU(),
             nn.MaxPool2d(kernel_size=3, stride=2),
@@ -38,16 +40,17 @@ class AlexNet(CustomModel):
             nn.Dropout(p=0.5),
             nn.Linear(4096, 4096), nn.ReLU(),
             nn.Dropout(p=0.5),
-            nn.Linear(4096, num_classes))
+            nn.Linear(4096, 200))
 
 
 
 class VGG11(CustomModel):
-    def __init__(self, in_channels=3, num_classes=1000):
+    def __init__(self):
         super(VGG11, self).__init__()
         conv_arch = ((1, 64), (1, 128), (2, 256), (2, 512), (2, 512))
 
         conv_blks = []
+        in_channels = 3
         for (num_convs, out_channels) in conv_arch:
             conv_blks.append(self.__vgg_block(num_convs, in_channels, out_channels))
             in_channels = out_channels
@@ -56,9 +59,10 @@ class VGG11(CustomModel):
             *conv_blks, nn.Flatten(),
             nn.Linear(conv_arch[-1][1] * 4 * 4, 4096), nn.ReLU(), nn.Dropout(0.5), # made for 128x128 input images
             nn.Linear(4096, 4096), nn.ReLU(), nn.Dropout(0.5),
-            nn.Linear(4096, num_classes))
+            nn.Linear(4096, 200))
 
-    def __vgg_block(self, num_convs, in_channels, out_channels):
+    @staticmethod
+    def __vgg_block(num_convs, in_channels, out_channels):
         layers = []
         for _ in range(num_convs):
             layers.append(nn.Conv2d(in_channels, out_channels,
@@ -71,10 +75,10 @@ class VGG11(CustomModel):
 
 
 class ResNet18(CustomModel):
-    def __init__(self, in_channels=3, num_classes=1000):
+    def __init__(self):
         super(ResNet18, self).__init__()
 
-        b1 = nn.Sequential(nn.Conv2d(in_channels, 64, kernel_size=7, stride=2, padding=3),
+        b1 = nn.Sequential(nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3),
                            nn.BatchNorm2d(64), nn.ReLU(),
                            nn.MaxPool2d(kernel_size=3, stride=2, padding=1))
         b2 = nn.Sequential(*self.__resnet_block(64, 64, 2, first_block=True))
@@ -84,35 +88,36 @@ class ResNet18(CustomModel):
 
         self._net = nn.Sequential(b1, b2, b3, b4, b5,
                             nn.AdaptiveAvgPool2d((1, 1)),
-                            nn.Flatten(), nn.Linear(512, num_classes))
+                            nn.Flatten(), nn.Linear(512, 200))
 
-    def __resnet_block(self, input_channels, num_channels, num_residuals, first_block=False):
+    @staticmethod
+    def __resnet_block(input_channels, num_channels, num_residuals, first_block=False):
 
         class Residual(nn.Module):
             """The Residual block of ResNet."""
 
-            def __init__(self, input_channels, num_channels,
+            def __init__(self, in_channels, channels,
                          use_1x1conv=False, strides=1):
                 super().__init__()
-                self.conv1 = nn.Conv2d(input_channels, num_channels,
+                self.conv1 = nn.Conv2d(in_channels, channels,
                                        kernel_size=3, padding=1, stride=strides)
-                self.bn1 = nn.BatchNorm2d(num_channels)
-                self.conv2 = nn.Conv2d(num_channels, num_channels,
+                self.bn1 = nn.BatchNorm2d(channels)
+                self.conv2 = nn.Conv2d(channels, channels,
                                        kernel_size=3, padding=1)
-                self.bn2 = nn.BatchNorm2d(num_channels)
+                self.bn2 = nn.BatchNorm2d(channels)
                 if use_1x1conv:
-                    self.conv3 = nn.Conv2d(input_channels, num_channels,
+                    self.conv3 = nn.Conv2d(in_channels, channels,
                                            kernel_size=1, stride=strides)
                 else:
                     self.conv3 = None
 
-            def forward(self, X):
-                Y = nn.ReLU()(self.bn1(self.conv1(X)))
-                Y = self.bn2(self.conv2(Y))
+            def forward(self, x):
+                y = nn.ReLU()(self.bn1(self.conv1(x)))
+                y = self.bn2(self.conv2(y))
                 if self.conv3:
-                    X = self.conv3(X)
-                Y += X
-                return nn.ReLU()(Y)
+                    x = self.conv3(x)
+                y += x
+                return nn.ReLU()(y)
 
         blk = []
         for i in range(num_residuals):

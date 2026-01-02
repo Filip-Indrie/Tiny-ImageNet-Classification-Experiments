@@ -3,7 +3,7 @@ from torch.utils.data import DataLoader
 import torch
 from torch import nn
 import time
-from os import makedirs
+import os
 
 __all__ = ["load_data_tiny_imagenet", "init_weights", "evaluate_accuracy", "train_epoch", "train", "try_gpu"]
 
@@ -114,7 +114,7 @@ def train_epoch(net, train_iter, loss, optimizer, device):
     # Return training loss and training accuracy
     return float(total_loss) / len(train_iter), float(total_hits) / total_samples  * 100
 
-def train(net, train_iter, val_iter, num_epochs, patience, loss, optimizer, weight_init,  device):
+def train(net, train_iter, val_iter, num_epochs, patience, loss, optimizer, weight_init,  device, delete_old_measurements=False):
     """Train a model."""
     train_loss_all = []
     train_acc_all = []
@@ -129,10 +129,20 @@ def train(net, train_iter, val_iter, num_epochs, patience, loss, optimizer, weig
     net.to(device)
 
     net_name = type(net).__name__
-    makedirs("Measurements", exist_ok=True)
-    stats_file = open("Measurements/" + net_name + '_stats.txt', 'w', encoding='utf-8')
+    dir_name = "Measurements/" + net_name + "/"
+    os.makedirs(dir_name, exist_ok=True)
 
-    stats_file.write(str(net) + "\n\n")
+    optimizer_name = type(optimizer).__name__
+    loss_name = type(loss).__name__
+    lr = str(optimizer.param_groups[0]['lr'])
+
+    stats_file_name = dir_name + weight_init + "_" + loss_name + "_" + optimizer_name + "_" + lr + ".txt"
+    if not os.path.exists(stats_file_name) or delete_old_measurements:
+        stats_file = open(stats_file_name, "w", encoding="utf-8")
+        stats_file.write(str(net) + "\n\n")
+    else:
+        stats_file = open(stats_file_name, "a", encoding="utf-8")
+        stats_file.write("\n")
 
     start_time = time.time()
 
@@ -160,7 +170,7 @@ def train(net, train_iter, val_iter, num_epochs, patience, loss, optimizer, weig
 
     end_time = time.time()
 
-    stats_file.write(f'\nBest Validation Accuracy {best_val_accuracy:.2f}, Epoch: {val_acc_all.index(best_val_accuracy) + 1}, Training Time: {end_time - start_time:.2f}s\n')
+    stats_file.write(f'Best Validation Accuracy {best_val_accuracy:.2f}, Epoch: {val_acc_all.index(best_val_accuracy) + 1}, Training Time: {end_time - start_time:.2f}s\n')
 
     stats_file.close()
 

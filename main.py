@@ -11,7 +11,7 @@ if __name__ == "__main__":
     batch_size = 128
     num_epochs = 1
     patience = 10
-    weight_init = 'xavier_normal'
+    weight_init = 'xavier_uniform'
     device = try_gpu()
     print(f"Training on {device}")
 
@@ -34,15 +34,13 @@ if __name__ == "__main__":
 
     train_iter, val_iter = load_data_tiny_imagenet(batch_size)
 
-    # print(type(str(alexnet)))
-    # print(vgg11)
-    # print(resnet18)
-
     print("\nAlexNet")
-    train_loss_alexnet, train_acc_alexnet, val_loss_alexnet, val_acc_alexnet = train(alexnet, train_iter, val_iter, num_epochs, patience, loss, optimizer_alexnet, weight_init, device)
+    train(alexnet, train_iter, val_iter, num_epochs, patience, loss, optimizer_alexnet, weight_init, device, delete_old_measurements=True)
+    train(alexnet, train_iter, val_iter, num_epochs, patience, loss, optimizer_alexnet, weight_init, device)
+    train(alexnet, train_iter, val_iter, num_epochs, patience, loss, optimizer_alexnet, weight_init, device)
 
-    # print("VGG11")
-    # train_loss_vgg11, train_acc_vgg11, val_loss_vgg11, val_acc_vgg11 = train(vgg11, train_iter, val_iter, num_epochs, patience, loss, optimizer_vgg11, weight_init, device)
-    #
+    print("VGG11")
+    train(vgg11, train_iter, val_iter, num_epochs, patience, loss, optimizer_vgg11, weight_init, device, delete_old_measurements=True)
+
     print("\nResNet18")
-    train_loss_resnet18, train_acc_resnet18, val_loss_resnet18, val_acc_resnet18 = train(resnet18, train_iter, val_iter, num_epochs, patience, loss, optimizer_resnet18, weight_init, device)
+    train(resnet18, train_iter, val_iter, num_epochs, patience, loss, optimizer_resnet18, weight_init, device, delete_old_measurements=True)

@@ -34,6 +34,35 @@ def load_data_tiny_imagenet(batch_size=128):
 
     return train_loader, val_loader
 
+def init_weights_random(m):
+    if type(m) == nn.Linear or type(m) == nn.Conv2d:
+        nn.init.uniform_(m.weight)
+
+def init_weights_xavier_uniform(m):
+    if type(m) == nn.Linear or type(m) == nn.Conv2d:
+        nn.init.xavier_uniform_(m.weight)
+
+def init_weights_xavier_normal(m):
+    if type(m) == nn.Linear or type(m) == nn.Conv2d:
+        nn.init.xavier_normal_(m.weight)
+
+def init_weights_kaiming_uniform(m):
+    if type(m) == nn.Linear or type(m) == nn.Conv2d:
+        nn.init.kaiming_uniform_(m.weight)
+
+def init_weights_kaiming_normal(m):
+    if type(m) == nn.Linear or type(m) == nn.Conv2d:
+        nn.init.kaiming_normal_(m.weight)
+
+def init_weights(mode):
+    match mode:
+        case 'random': return init_weights_random
+        case 'xavier_uniform': return init_weights_xavier_uniform
+        case 'xavier_normal': return init_weights_xavier_normal
+        case 'kaiming_uniform': return init_weights_kaiming_uniform
+        case 'kaiming_normal': return init_weights_kaiming_normal
+        case _: return init_weights_random
+
 def evaluate_accuracy(net, data_iter, loss, device):
     """Compute the accuracy for a model on a dataset."""
     net.eval()  # Set the model to evaluation mode
@@ -82,7 +111,7 @@ def train_epoch(net, train_iter, loss, optimizer, device):
     # Return training loss and training accuracy
     return float(total_loss) / len(train_iter), float(total_hits) / total_samples  * 100
 
-def train(net, train_iter, val_iter, num_epochs, patience, loss, optimizer, device):
+def train(net, train_iter, val_iter, num_epochs, patience, loss, optimizer, weight_init,  device):
     """Train a model."""
     train_loss_all = []
     train_acc_all = []
@@ -92,10 +121,7 @@ def train(net, train_iter, val_iter, num_epochs, patience, loss, optimizer, devi
     best_val_accuracy = 0
     counter = 0
 
-    def init_weights(m):
-        if type(m) == nn.Linear or type(m) == nn.Conv2d:
-            nn.init.xavier_uniform_(m.weight)
-    net.apply(init_weights)
+    net.apply(init_weights(weight_init))
 
     net.to(device)
 

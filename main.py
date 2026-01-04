@@ -8,15 +8,29 @@ if __name__ == "__main__":
     vgg11 = VGG11()
     resnet18 = ResNet18()
     resnet34 = ResNet34()
+    resnet50 = ResNet50()
     scope2 = Scope2()
     scope3 = Scope3()
+    scope2atrous = Scope2Atrous()
+    scope3atrous = Scope3Atrous()
+    shallowbottlenet = ShallowBottleNet()
+    bottlenet = BottleNet()
+    deepbottlenet = DeepBottleNet()
+    deeperbottlenet = DeeperBottleNet()
 
     # print(alexnet)
     # print(vgg11)
     # print(resnet18)
-    print(resnet34)
-    print(scope2)
-    print(scope3)
+    # print(resnet34)
+    # print(resnet50)
+    # print(scope2)
+    # print(scope3)
+    # print(scope2atrous)
+    # print(scope3atrous)
+    print(shallowbottlenet)
+    # print(bottlenet)
+    # print(deepbottlenet)
+    # print(deeperbottlenet)
 
 
 
@@ -46,11 +60,11 @@ if __name__ == "__main__":
 
     train_iter, val_iter = load_data_tiny_imagenet(batch_size)
 
-    print("\nResNet34")
-    train(resnet34, train_iter, val_iter, num_epochs, patience, loss, optimizer_resnet34, weight_init, device, delete_old_measurements=True)
-
-    print("\nScope2")
-    train(scope2, train_iter, val_iter, num_epochs, patience, loss, optimizer_scope2, weight_init, device, delete_old_measurements=True)
-
-    print("\nScope3")
-    train(scope3, train_iter, val_iter, num_epochs, patience, loss, optimizer_scope3, weight_init, device, delete_old_measurements=True)
+    # print("\nResNet34")
+    # train(resnet34, train_iter, val_iter, num_epochs, patience, loss, optimizer_resnet34, weight_init, device, delete_old_measurements=True)
+    #
+    # print("\nScope2")
+    # train(scope2, train_iter, val_iter, num_epochs, patience, loss, optimizer_scope2, weight_init, device, delete_old_measurements=True)
+    #
+    # print("\nScope3")
+    # train(scope3, train_iter, val_iter, num_epochs, patience, loss, optimizer_scope3, weight_init, device, delete_old_measurements=True)

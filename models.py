@@ -254,9 +254,9 @@ class Scope2Block(nn.Module):
             column1 += [nn.Conv2d(out_chan, out_chan, kernel_size=kernel_size1, padding=1, dilation=1), nn.BatchNorm2d(out_chan), nn.ReLU()]
         self.conv1 = nn.Sequential(*column1)
 
-        column2 = [nn.Conv2d(in_chan, out_chan, kernel_size=kernel_size2, padding=dilation, dilation=dilation), nn.BatchNorm2d(out_chan), nn.ReLU()]
+        column2 = [nn.Conv2d(in_chan, out_chan, kernel_size=kernel_size2, padding=kernel_size2//2*dilation, dilation=dilation), nn.BatchNorm2d(out_chan), nn.ReLU()]
         for _ in range(num_convs - 1):
-            column2 += [nn.Conv2d(out_chan, out_chan, kernel_size=kernel_size2, padding=dilation, dilation=dilation), nn.BatchNorm2d(out_chan), nn.ReLU()]
+            column2 += [nn.Conv2d(out_chan, out_chan, kernel_size=kernel_size2, padding=kernel_size2//2*dilation, dilation=dilation), nn.BatchNorm2d(out_chan), nn.ReLU()]
         self.conv2 = nn.Sequential(*column2)
 
         self.project = nn.Conv2d(out_chan * 2, out_chan, kernel_size=1, padding=0, stride=stride)
@@ -289,14 +289,14 @@ class Scope3Block(nn.Module):
             column1 += [nn.Conv2d(out_chan, out_chan, kernel_size=kernel_size1, padding=1, dilation=1), nn.BatchNorm2d(out_chan), nn.ReLU()]
         self.conv1 = nn.Sequential(*column1)
 
-        column2 = [nn.Conv2d(in_chan, out_chan, kernel_size=kernel_size2, padding=dilation1, dilation=dilation1), nn.BatchNorm2d(out_chan), nn.ReLU()]
+        column2 = [nn.Conv2d(in_chan, out_chan, kernel_size=kernel_size2, padding=kernel_size2//2*dilation1, dilation=dilation1), nn.BatchNorm2d(out_chan), nn.ReLU()]
         for _ in range(num_convs - 1):
-            column2 += [nn.Conv2d(out_chan, out_chan, kernel_size=kernel_size2, padding=dilation1, dilation=dilation1), nn.BatchNorm2d(out_chan), nn.ReLU()]
+            column2 += [nn.Conv2d(out_chan, out_chan, kernel_size=kernel_size2, padding=kernel_size2//2*dilation1, dilation=dilation1), nn.BatchNorm2d(out_chan), nn.ReLU()]
         self.conv2 = nn.Sequential(*column2)
 
-        column3 = [nn.Conv2d(in_chan, out_chan, kernel_size=kernel_size3, padding=dilation2, dilation=dilation2), nn.BatchNorm2d(out_chan), nn.ReLU()]
+        column3 = [nn.Conv2d(in_chan, out_chan, kernel_size=kernel_size3, padding=kernel_size3//2*dilation2, dilation=dilation2), nn.BatchNorm2d(out_chan), nn.ReLU()]
         for _ in range(num_convs - 1):
-            column3 += [nn.Conv2d(out_chan, out_chan, kernel_size=kernel_size3, padding=dilation2, dilation=dilation2), nn.BatchNorm2d(out_chan), nn.ReLU()]
+            column3 += [nn.Conv2d(out_chan, out_chan, kernel_size=kernel_size3, padding=kernel_size3//2*dilation2, dilation=dilation2), nn.BatchNorm2d(out_chan), nn.ReLU()]
         self.conv3 = nn.Sequential(*column3)
 
         self.project = nn.Conv2d(out_chan * 3, out_chan, kernel_size=1, padding=0, stride=stride)

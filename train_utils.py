@@ -87,7 +87,8 @@ def evaluate_accuracy(net, data_iter, loss, device):
     return float(total_loss) / len(data_iter), float(total_hits) / total_samples  * 100
 
 def train_epoch(net, train_iter, loss, optimizer, device):
-    # Set the model to training mode
+    # Uses default precision
+
     net.train()
 
     # Sum of training loss, sum of training correct predictions, no. of examples
@@ -113,6 +114,37 @@ def train_epoch(net, train_iter, loss, optimizer, device):
 
     # Return training loss and training accuracy
     return float(total_loss) / len(train_iter), float(total_hits) / total_samples  * 100
+
+def train_epoch_amp(net, train_iter, loss, optimizer, scaler, device):
+    # Uses automatic mixed precision
+
+    net.train()
+
+    # Sum of training loss, sum of training correct predictions, no. of examples
+    total_loss = 0
+    total_hits = 0
+    total_samples = 0
+
+    for x, y in train_iter:
+        # Compute gradients and update parameters
+        x, y = x.to(device), y.to(device)
+        optimizer.zero_grad()
+
+        with torch.amp.autocast("cuda"):
+            y_hat = net(x)
+            l = loss(y_hat, y)
+
+        scaler.scale(l).backward()
+        scaler.step(optimizer)
+        scaler.update()
+
+        with torch.no_grad():
+            total_loss += float(l)
+            total_hits += (y_hat.argmax(axis=1).type(y.dtype) == y).sum()
+            total_samples += y.numel()
+
+    # Return training loss and training accuracy
+    return float(total_loss) / len(train_iter), float(total_hits) / total_samples * 100
 
 def train(net, train_iter, val_iter, num_epochs, patience, loss, optimizer, weight_init,  device, delete_old_measurements=False):
     """Train a model."""
@@ -146,10 +178,12 @@ def train(net, train_iter, val_iter, num_epochs, patience, loss, optimizer, weig
 
     start_time = time.time()
 
+    scaler = torch.amp.GradScaler()
+
     for epoch in range(num_epochs):
         print(f"Epoch {epoch + 1}")
 
-        train_loss, train_acc = train_epoch(net, train_iter, loss, optimizer, device)
+        train_loss, train_acc = train_epoch_amp(net, train_iter, loss, optimizer, scaler, device)
         train_loss_all.append(train_loss)
         train_acc_all.append(train_acc)
 

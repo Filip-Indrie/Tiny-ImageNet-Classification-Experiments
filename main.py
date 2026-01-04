@@ -1,5 +1,3 @@
-from torchvision.models import alexnet
-
 from train_utils import *
 from models import *
 import torch

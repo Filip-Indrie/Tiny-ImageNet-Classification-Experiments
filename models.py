@@ -1,8 +1,9 @@
+import torch
 from torch import nn
 from torchinfo import summary
 from abc import ABC
 
-__all__ = ["AlexNet", "VGG11", "ResNet18"]
+__all__ = ["AlexNet", "VGG11", "ResNet18", "ResNet34", "Scope2", "Scope3"]
 
 class CustomModel(nn.Module, ABC):
     """
@@ -74,6 +75,34 @@ class VGG11(CustomModel):
 
 
 
+class Residual(nn.Module):
+    """The Residual block of ResNet."""
+
+    def __init__(self, in_channels, channels, use_1x1conv=False, strides=1):
+        super().__init__()
+        self.conv1 = nn.Conv2d(in_channels, channels, kernel_size=3, padding=1, stride=strides)
+        self.bn1 = nn.BatchNorm2d(channels)
+
+        self.conv2 = nn.Conv2d(channels, channels, kernel_size=3, padding=1)
+        self.bn2 = nn.BatchNorm2d(channels)
+
+        if use_1x1conv:
+            self.conv3 = nn.Conv2d(in_channels, channels, kernel_size=1, stride=strides)
+            self.bn3 = nn.BatchNorm2d(channels)
+        else:
+            self.conv3 = None
+            self.bn3 = None
+
+    def forward(self, x):
+        y = nn.ReLU()(self.bn1(self.conv1(x)))
+        y = self.bn2(self.conv2(y))
+        if self.conv3:
+            x = self.bn3(self.conv3(x))
+        y += x
+        return nn.ReLU()(y)
+
+
+
 class ResNet18(CustomModel):
     def __init__(self):
         super(ResNet18, self).__init__()
@@ -92,33 +121,6 @@ class ResNet18(CustomModel):
 
     @staticmethod
     def __resnet_block(input_channels, num_channels, num_residuals, first_block=False):
-
-        class Residual(nn.Module):
-            """The Residual block of ResNet."""
-
-            def __init__(self, in_channels, channels,
-                         use_1x1conv=False, strides=1):
-                super().__init__()
-                self.conv1 = nn.Conv2d(in_channels, channels,
-                                       kernel_size=3, padding=1, stride=strides)
-                self.bn1 = nn.BatchNorm2d(channels)
-                self.conv2 = nn.Conv2d(channels, channels,
-                                       kernel_size=3, padding=1)
-                self.bn2 = nn.BatchNorm2d(channels)
-                if use_1x1conv:
-                    self.conv3 = nn.Conv2d(in_channels, channels,
-                                           kernel_size=1, stride=strides)
-                else:
-                    self.conv3 = None
-
-            def forward(self, x):
-                y = nn.ReLU()(self.bn1(self.conv1(x)))
-                y = self.bn2(self.conv2(y))
-                if self.conv3:
-                    x = self.conv3(x)
-                y += x
-                return nn.ReLU()(y)
-
         blk = []
         for i in range(num_residuals):
             if i == 0 and not first_block:
@@ -128,3 +130,156 @@ class ResNet18(CustomModel):
                 blk.append(Residual(num_channels, num_channels))
 
         return blk
+
+
+
+class ResNet34(CustomModel):
+    def __init__(self):
+        super(ResNet34, self).__init__()
+        stem = nn.Sequential(
+            nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+        )
+
+        b1 = self.__basic_block(64, 64, 3, first_block=True)
+        b2 = self.__basic_block(64, 128, 4)
+        b3 = self.__basic_block(128, 256, 6)
+        b4 = self.__basic_block(256, 512, 3)
+
+        self._net = nn.Sequential(
+            stem, b1, b2, b3, b4,
+            nn.AdaptiveAvgPool2d((1, 1)),
+            nn.Flatten(),
+            nn.Linear(512, 200)
+        )
+
+    @staticmethod
+    def __basic_block(input_channels, output_channels, num_residuals, first_block=False):
+        blocks = []
+        for block in range(num_residuals):
+            if block == 0 and not first_block:
+                blocks.append(Residual(input_channels, output_channels, use_1x1conv=True, strides=2))
+            else:
+                blocks.append(Residual(output_channels, output_channels))
+
+        return nn.Sequential(*blocks)
+
+
+
+class ResidualBottleneck(nn.Module):
+    pass
+
+
+
+class ResNet50(CustomModel):
+    pass
+
+
+
+class Scope2(CustomModel):
+    def __init__(self):
+        super(Scope2, self).__init__()
+        b1 = self.CustomBlock(3, 64, stride=2)
+        b2 = self.CustomBlock(64, 128, stride=2)
+        b3 = self.CustomBlock(128, 256, stride=2)
+        b4 = self.CustomBlock(256, 512, stride=2)
+        b5 = self.CustomBlock(512, 512, stride=2)
+
+        self._net = nn.Sequential(
+            b1, b2, b3, b4, b5,
+            nn.AdaptiveAvgPool2d((1, 1)),
+            nn.Flatten(),
+            nn.Linear(512, 200)
+        )
+
+    class CustomBlock(nn.Module):
+        def __init__(self, in_chan, out_chan, num_convs=1, stride=1):
+            super().__init__()
+
+            column1 = [nn.Conv2d(in_chan, out_chan, kernel_size=3, padding=1), nn.BatchNorm2d(out_chan), nn.ReLU()]
+            for _ in range(num_convs - 1):
+                column1 += [nn.Conv2d(out_chan, out_chan, kernel_size=3, padding=1), nn.BatchNorm2d(out_chan), nn.ReLU()]
+            self.conv1 = nn.Sequential(*column1)
+
+            column2 = [nn.Conv2d(in_chan, out_chan, kernel_size=5, padding=2), nn.BatchNorm2d(out_chan), nn.ReLU()]
+            for _ in range(num_convs - 1):
+                column2 += [nn.Conv2d(out_chan, out_chan, kernel_size=5, padding=2), nn.BatchNorm2d(out_chan), nn.ReLU()]
+            self.conv2 = nn.Sequential(*column2)
+
+            self.project = nn.Conv2d(out_chan * 2, out_chan, kernel_size=1, padding=0, stride=stride)
+            self.bn1 = nn.BatchNorm2d(out_chan)
+
+            self.residual = nn.Conv2d(in_chan, out_chan, kernel_size=1, padding=0, stride=stride)
+            self.bn2 = nn.BatchNorm2d(out_chan)
+
+            self.act = nn.ReLU()
+
+        def forward(self, x):
+            a = self.conv1(x)
+            b = self.conv2(x)
+            concat = torch.cat([a, b], dim=1)
+            projection = self.bn1(self.project(concat))
+
+            residual = self.bn2(self.residual(x))
+
+            # MINOT TWEAK: You can scale back the residual connection (0.1) to prevent it dominating the output
+            return self.act(projection + residual)
+
+
+
+class Scope3(CustomModel):
+    def __init__(self):
+        super(Scope3, self).__init__()
+        b1 = self.CustomBlock(3, 64, stride=2)
+        b2 = self.CustomBlock(64, 128, stride=2)
+        b3 = self.CustomBlock(128, 256, stride=2)
+        b4 = self.CustomBlock(256, 512, stride=2)
+        b5 = self.CustomBlock(512, 512, stride=2)
+
+        self._net = nn.Sequential(
+            b1, b2, b3, b4, b5,
+            nn.AdaptiveAvgPool2d((1, 1)),
+            nn.Flatten(),
+            nn.Linear(512, 200)
+        )
+
+    class CustomBlock(nn.Module):
+        def __init__(self, in_chan, out_chan, num_convs=1, stride=1):
+            super().__init__()
+
+            column1 = [nn.Conv2d(in_chan, out_chan, kernel_size=3, padding=1), nn.BatchNorm2d(out_chan), nn.ReLU()]
+            for _ in range(num_convs - 1):
+                column1 += [nn.Conv2d(out_chan, out_chan, kernel_size=3, padding=1), nn.BatchNorm2d(out_chan), nn.ReLU()]
+            self.conv1 = nn.Sequential(*column1)
+
+            column2 = [nn.Conv2d(in_chan, out_chan, kernel_size=5, padding=2), nn.BatchNorm2d(out_chan), nn.ReLU()]
+            for _ in range(num_convs - 1):
+                column2 += [nn.Conv2d(out_chan, out_chan, kernel_size=5, padding=2), nn.BatchNorm2d(out_chan), nn.ReLU()]
+            self.conv2 = nn.Sequential(*column2)
+
+            column3 = [nn.Conv2d(in_chan, out_chan, kernel_size=7, padding=3), nn.BatchNorm2d(out_chan), nn.ReLU()]
+            for _ in range(num_convs - 1):
+                column3 += [nn.Conv2d(out_chan, out_chan, kernel_size=7, padding=3), nn.BatchNorm2d(out_chan), nn.ReLU()]
+            self.conv3 = nn.Sequential(*column3)
+
+            self.project = nn.Conv2d(out_chan * 3, out_chan, kernel_size=1, padding=0, stride=stride)
+            self.bn1 = nn.BatchNorm2d(out_chan)
+
+            self.residual = nn.Conv2d(in_chan, out_chan, kernel_size=1, padding=0, stride=stride)
+            self.bn2 = nn.BatchNorm2d(out_chan)
+
+            self.act = nn.ReLU()
+
+        def forward(self, x):
+            a = self.conv1(x)
+            b = self.conv2(x)
+            c = self.conv3(x)
+            concat = torch.cat([a, b, c], dim=1)
+            projection = self.bn1(self.project(concat))
+
+            residual = self.bn2(self.residual(x))
+
+            # MINOT TWEAK: You can scale back the residual connection (0.1) to prevent it dominating the output
+            return self.act(projection + residual)

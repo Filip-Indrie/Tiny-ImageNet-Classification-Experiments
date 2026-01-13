@@ -2,6 +2,8 @@ from train_utils import *
 from models import *
 import torch
 
+torch.manual_seed(42)
+
 if __name__ == "__main__":
 
     nets = [
@@ -23,9 +25,8 @@ if __name__ == "__main__":
 
 
     batch_size = 64
-    num_epochs = 1
+    num_epochs = 100
     patience = 10
-    weight_init = 'xavier_uniform'
     lr = 0.1
 
     """
@@ -40,9 +41,17 @@ if __name__ == "__main__":
     train_iter, val_iter = load_data_tiny_imagenet(batch_size)
 
     device = try_gpu()
-    print(f"Training on {device}")
+    print(f"Training on {torch.cuda.get_device_name(device)}")
 
-    for net in nets:
-        optimizer = torch.optim.SGD(net.parameters(), lr=lr, weight_decay=0)
-        print(type(net).__name__)
-        train(net, train_iter, val_iter, num_epochs, patience, loss, optimizer, weight_init, device)
+    weight_inits = ["default", "xavier_uniform", "xavier_normal", "kaiming_uniform", "kaiming_normal"]
+    optimizers = ["sgd", "sgd_nestrov", "adam", "adamw"]
+
+    combos_used = []
+
+    for optimizer in optimizers:
+        for weight_init in weight_inits:
+
+            print(optimizer, weight_init)
+            resnet50 = ResNet50()
+            opt = get_optimizer(resnet50, optimizer)
+            train(resnet50, train_iter, val_iter, num_epochs, patience, loss, opt, weight_init, device)

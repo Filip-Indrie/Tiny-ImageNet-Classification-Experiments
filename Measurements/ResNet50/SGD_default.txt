@@ -1,0 +1,331 @@
+==========================================================================================
+Layer (type:depth-idx)                   Output Shape              Param #
+==========================================================================================
+Sequential                               [1, 200]                  --
+├─Sequential: 1-1                        [1, 64, 32, 32]           --
+│    └─Conv2d: 2-1                       [1, 64, 64, 64]           9,472
+│    └─BatchNorm2d: 2-2                  [1, 64, 64, 64]           128
+│    └─ReLU: 2-3                         [1, 64, 64, 64]           --
+│    └─MaxPool2d: 2-4                    [1, 64, 32, 32]           --
+├─Sequential: 1-2                        [1, 256, 32, 32]          --
+│    └─ResidualBottleneck: 2-5           [1, 256, 32, 32]          --
+│    │    └─Conv2d: 3-1                  [1, 64, 32, 32]           4,160
+│    │    └─BatchNorm2d: 3-2             [1, 64, 32, 32]           128
+│    │    └─ReLU: 3-3                    [1, 64, 32, 32]           --
+│    │    └─Conv2d: 3-4                  [1, 64, 32, 32]           36,928
+│    │    └─BatchNorm2d: 3-5             [1, 64, 32, 32]           128
+│    │    └─ReLU: 3-6                    [1, 64, 32, 32]           --
+│    │    └─Conv2d: 3-7                  [1, 256, 32, 32]          16,640
+│    │    └─BatchNorm2d: 3-8             [1, 256, 32, 32]          512
+│    │    └─Sequential: 3-9              [1, 256, 32, 32]          17,152
+│    │    └─ReLU: 3-10                   [1, 256, 32, 32]          --
+│    └─ResidualBottleneck: 2-6           [1, 256, 32, 32]          --
+│    │    └─Conv2d: 3-11                 [1, 64, 32, 32]           16,448
+│    │    └─BatchNorm2d: 3-12            [1, 64, 32, 32]           128
+│    │    └─ReLU: 3-13                   [1, 64, 32, 32]           --
+│    │    └─Conv2d: 3-14                 [1, 64, 32, 32]           36,928
+│    │    └─BatchNorm2d: 3-15            [1, 64, 32, 32]           128
+│    │    └─ReLU: 3-16                   [1, 64, 32, 32]           --
+│    │    └─Conv2d: 3-17                 [1, 256, 32, 32]          16,640
+│    │    └─BatchNorm2d: 3-18            [1, 256, 32, 32]          512
+│    │    └─ReLU: 3-19                   [1, 256, 32, 32]          --
+│    └─ResidualBottleneck: 2-7           [1, 256, 32, 32]          --
+│    │    └─Conv2d: 3-20                 [1, 64, 32, 32]           16,448
+│    │    └─BatchNorm2d: 3-21            [1, 64, 32, 32]           128
+│    │    └─ReLU: 3-22                   [1, 64, 32, 32]           --
+│    │    └─Conv2d: 3-23                 [1, 64, 32, 32]           36,928
+│    │    └─BatchNorm2d: 3-24            [1, 64, 32, 32]           128
+│    │    └─ReLU: 3-25                   [1, 64, 32, 32]           --
+│    │    └─Conv2d: 3-26                 [1, 256, 32, 32]          16,640
+│    │    └─BatchNorm2d: 3-27            [1, 256, 32, 32]          512
+│    │    └─ReLU: 3-28                   [1, 256, 32, 32]          --
+├─Sequential: 1-3                        [1, 512, 16, 16]          --
+│    └─ResidualBottleneck: 2-8           [1, 512, 16, 16]          --
+│    │    └─Conv2d: 3-29                 [1, 128, 32, 32]          32,896
+│    │    └─BatchNorm2d: 3-30            [1, 128, 32, 32]          256
+│    │    └─ReLU: 3-31                   [1, 128, 32, 32]          --
+│    │    └─Conv2d: 3-32                 [1, 128, 16, 16]          147,584
+│    │    └─BatchNorm2d: 3-33            [1, 128, 16, 16]          256
+│    │    └─ReLU: 3-34                   [1, 128, 16, 16]          --
+│    │    └─Conv2d: 3-35                 [1, 512, 16, 16]          66,048
+│    │    └─BatchNorm2d: 3-36            [1, 512, 16, 16]          1,024
+│    │    └─Sequential: 3-37             [1, 512, 16, 16]          132,608
+│    │    └─ReLU: 3-38                   [1, 512, 16, 16]          --
+│    └─ResidualBottleneck: 2-9           [1, 512, 16, 16]          --
+│    │    └─Conv2d: 3-39                 [1, 128, 16, 16]          65,664
+│    │    └─BatchNorm2d: 3-40            [1, 128, 16, 16]          256
+│    │    └─ReLU: 3-41                   [1, 128, 16, 16]          --
+│    │    └─Conv2d: 3-42                 [1, 128, 16, 16]          147,584
+│    │    └─BatchNorm2d: 3-43            [1, 128, 16, 16]          256
+│    │    └─ReLU: 3-44                   [1, 128, 16, 16]          --
+│    │    └─Conv2d: 3-45                 [1, 512, 16, 16]          66,048
+│    │    └─BatchNorm2d: 3-46            [1, 512, 16, 16]          1,024
+│    │    └─ReLU: 3-47                   [1, 512, 16, 16]          --
+│    └─ResidualBottleneck: 2-10          [1, 512, 16, 16]          --
+│    │    └─Conv2d: 3-48                 [1, 128, 16, 16]          65,664
+│    │    └─BatchNorm2d: 3-49            [1, 128, 16, 16]          256
+│    │    └─ReLU: 3-50                   [1, 128, 16, 16]          --
+│    │    └─Conv2d: 3-51                 [1, 128, 16, 16]          147,584
+│    │    └─BatchNorm2d: 3-52            [1, 128, 16, 16]          256
+│    │    └─ReLU: 3-53                   [1, 128, 16, 16]          --
+│    │    └─Conv2d: 3-54                 [1, 512, 16, 16]          66,048
+│    │    └─BatchNorm2d: 3-55            [1, 512, 16, 16]          1,024
+│    │    └─ReLU: 3-56                   [1, 512, 16, 16]          --
+│    └─ResidualBottleneck: 2-11          [1, 512, 16, 16]          --
+│    │    └─Conv2d: 3-57                 [1, 128, 16, 16]          65,664
+│    │    └─BatchNorm2d: 3-58            [1, 128, 16, 16]          256
+│    │    └─ReLU: 3-59                   [1, 128, 16, 16]          --
+│    │    └─Conv2d: 3-60                 [1, 128, 16, 16]          147,584
+│    │    └─BatchNorm2d: 3-61            [1, 128, 16, 16]          256
+│    │    └─ReLU: 3-62                   [1, 128, 16, 16]          --
+│    │    └─Conv2d: 3-63                 [1, 512, 16, 16]          66,048
+│    │    └─BatchNorm2d: 3-64            [1, 512, 16, 16]          1,024
+│    │    └─ReLU: 3-65                   [1, 512, 16, 16]          --
+├─Sequential: 1-4                        [1, 1024, 8, 8]           --
+│    └─ResidualBottleneck: 2-12          [1, 1024, 8, 8]           --
+│    │    └─Conv2d: 3-66                 [1, 256, 16, 16]          131,328
+│    │    └─BatchNorm2d: 3-67            [1, 256, 16, 16]          512
+│    │    └─ReLU: 3-68                   [1, 256, 16, 16]          --
+│    │    └─Conv2d: 3-69                 [1, 256, 8, 8]            590,080
+│    │    └─BatchNorm2d: 3-70            [1, 256, 8, 8]            512
+│    │    └─ReLU: 3-71                   [1, 256, 8, 8]            --
+│    │    └─Conv2d: 3-72                 [1, 1024, 8, 8]           263,168
+│    │    └─BatchNorm2d: 3-73            [1, 1024, 8, 8]           2,048
+│    │    └─Sequential: 3-74             [1, 1024, 8, 8]           527,360
+│    │    └─ReLU: 3-75                   [1, 1024, 8, 8]           --
+│    └─ResidualBottleneck: 2-13          [1, 1024, 8, 8]           --
+│    │    └─Conv2d: 3-76                 [1, 256, 8, 8]            262,400
+│    │    └─BatchNorm2d: 3-77            [1, 256, 8, 8]            512
+│    │    └─ReLU: 3-78                   [1, 256, 8, 8]            --
+│    │    └─Conv2d: 3-79                 [1, 256, 8, 8]            590,080
+│    │    └─BatchNorm2d: 3-80            [1, 256, 8, 8]            512
+│    │    └─ReLU: 3-81                   [1, 256, 8, 8]            --
+│    │    └─Conv2d: 3-82                 [1, 1024, 8, 8]           263,168
+│    │    └─BatchNorm2d: 3-83            [1, 1024, 8, 8]           2,048
+│    │    └─ReLU: 3-84                   [1, 1024, 8, 8]           --
+│    └─ResidualBottleneck: 2-14          [1, 1024, 8, 8]           --
+│    │    └─Conv2d: 3-85                 [1, 256, 8, 8]            262,400
+│    │    └─BatchNorm2d: 3-86            [1, 256, 8, 8]            512
+│    │    └─ReLU: 3-87                   [1, 256, 8, 8]            --
+│    │    └─Conv2d: 3-88                 [1, 256, 8, 8]            590,080
+│    │    └─BatchNorm2d: 3-89            [1, 256, 8, 8]            512
+│    │    └─ReLU: 3-90                   [1, 256, 8, 8]            --
+│    │    └─Conv2d: 3-91                 [1, 1024, 8, 8]           263,168
+│    │    └─BatchNorm2d: 3-92            [1, 1024, 8, 8]           2,048
+│    │    └─ReLU: 3-93                   [1, 1024, 8, 8]           --
+│    └─ResidualBottleneck: 2-15          [1, 1024, 8, 8]           --
+│    │    └─Conv2d: 3-94                 [1, 256, 8, 8]            262,400
+│    │    └─BatchNorm2d: 3-95            [1, 256, 8, 8]            512
+│    │    └─ReLU: 3-96                   [1, 256, 8, 8]            --
+│    │    └─Conv2d: 3-97                 [1, 256, 8, 8]            590,080
+│    │    └─BatchNorm2d: 3-98            [1, 256, 8, 8]            512
+│    │    └─ReLU: 3-99                   [1, 256, 8, 8]            --
+│    │    └─Conv2d: 3-100                [1, 1024, 8, 8]           263,168
+│    │    └─BatchNorm2d: 3-101           [1, 1024, 8, 8]           2,048
+│    │    └─ReLU: 3-102                  [1, 1024, 8, 8]           --
+│    └─ResidualBottleneck: 2-16          [1, 1024, 8, 8]           --
+│    │    └─Conv2d: 3-103                [1, 256, 8, 8]            262,400
+│    │    └─BatchNorm2d: 3-104           [1, 256, 8, 8]            512
+│    │    └─ReLU: 3-105                  [1, 256, 8, 8]            --
+│    │    └─Conv2d: 3-106                [1, 256, 8, 8]            590,080
+│    │    └─BatchNorm2d: 3-107           [1, 256, 8, 8]            512
+│    │    └─ReLU: 3-108                  [1, 256, 8, 8]            --
+│    │    └─Conv2d: 3-109                [1, 1024, 8, 8]           263,168
+│    │    └─BatchNorm2d: 3-110           [1, 1024, 8, 8]           2,048
+│    │    └─ReLU: 3-111                  [1, 1024, 8, 8]           --
+│    └─ResidualBottleneck: 2-17          [1, 1024, 8, 8]           --
+│    │    └─Conv2d: 3-112                [1, 256, 8, 8]            262,400
+│    │    └─BatchNorm2d: 3-113           [1, 256, 8, 8]            512
+│    │    └─ReLU: 3-114                  [1, 256, 8, 8]            --
+│    │    └─Conv2d: 3-115                [1, 256, 8, 8]            590,080
+│    │    └─BatchNorm2d: 3-116           [1, 256, 8, 8]            512
+│    │    └─ReLU: 3-117                  [1, 256, 8, 8]            --
+│    │    └─Conv2d: 3-118                [1, 1024, 8, 8]           263,168
+│    │    └─BatchNorm2d: 3-119           [1, 1024, 8, 8]           2,048
+│    │    └─ReLU: 3-120                  [1, 1024, 8, 8]           --
+├─Sequential: 1-5                        [1, 2048, 4, 4]           --
+│    └─ResidualBottleneck: 2-18          [1, 2048, 4, 4]           --
+│    │    └─Conv2d: 3-121                [1, 512, 8, 8]            524,800
+│    │    └─BatchNorm2d: 3-122           [1, 512, 8, 8]            1,024
+│    │    └─ReLU: 3-123                  [1, 512, 8, 8]            --
+│    │    └─Conv2d: 3-124                [1, 512, 4, 4]            2,359,808
+│    │    └─BatchNorm2d: 3-125           [1, 512, 4, 4]            1,024
+│    │    └─ReLU: 3-126                  [1, 512, 4, 4]            --
+│    │    └─Conv2d: 3-127                [1, 2048, 4, 4]           1,050,624
+│    │    └─BatchNorm2d: 3-128           [1, 2048, 4, 4]           4,096
+│    │    └─Sequential: 3-129            [1, 2048, 4, 4]           2,103,296
+│    │    └─ReLU: 3-130                  [1, 2048, 4, 4]           --
+│    └─ResidualBottleneck: 2-19          [1, 2048, 4, 4]           --
+│    │    └─Conv2d: 3-131                [1, 512, 4, 4]            1,049,088
+│    │    └─BatchNorm2d: 3-132           [1, 512, 4, 4]            1,024
+│    │    └─ReLU: 3-133                  [1, 512, 4, 4]            --
+│    │    └─Conv2d: 3-134                [1, 512, 4, 4]            2,359,808
+│    │    └─BatchNorm2d: 3-135           [1, 512, 4, 4]            1,024
+│    │    └─ReLU: 3-136                  [1, 512, 4, 4]            --
+│    │    └─Conv2d: 3-137                [1, 2048, 4, 4]           1,050,624
+│    │    └─BatchNorm2d: 3-138           [1, 2048, 4, 4]           4,096
+│    │    └─ReLU: 3-139                  [1, 2048, 4, 4]           --
+│    └─ResidualBottleneck: 2-20          [1, 2048, 4, 4]           --
+│    │    └─Conv2d: 3-140                [1, 512, 4, 4]            1,049,088
+│    │    └─BatchNorm2d: 3-141           [1, 512, 4, 4]            1,024
+│    │    └─ReLU: 3-142                  [1, 512, 4, 4]            --
+│    │    └─Conv2d: 3-143                [1, 512, 4, 4]            2,359,808
+│    │    └─BatchNorm2d: 3-144           [1, 512, 4, 4]            1,024
+│    │    └─ReLU: 3-145                  [1, 512, 4, 4]            --
+│    │    └─Conv2d: 3-146                [1, 2048, 4, 4]           1,050,624
+│    │    └─BatchNorm2d: 3-147           [1, 2048, 4, 4]           4,096
+│    │    └─ReLU: 3-148                  [1, 2048, 4, 4]           --
+├─AdaptiveAvgPool2d: 1-6                 [1, 2048, 1, 1]           --
+├─Flatten: 1-7                           [1, 2048]                 --
+├─Linear: 1-8                            [1, 200]                  409,800
+==========================================================================================
+Total params: 23,944,392
+Trainable params: 23,944,392
+Non-trainable params: 0
+Total mult-adds (Units.GIGABYTES): 1.34
+==========================================================================================
+Input size (MB): 0.20
+Forward/backward pass size (MB): 58.07
+Params size (MB): 95.78
+Estimated Total Size (MB): 154.04
+==========================================================================================
+
+Epoch 1, Train loss 5.27, Train accuracy 1.02, Validation loss 5.04, Validation accuracy 2.01
+Epoch 2, Train loss 4.88, Train accuracy 3.11, Validation loss 4.65, Validation accuracy 5.02
+Epoch 3, Train loss 4.45, Train accuracy 7.36, Validation loss 4.23, Validation accuracy 10.03
+Epoch 4, Train loss 4.05, Train accuracy 12.74, Validation loss 3.91, Validation accuracy 15.79
+Epoch 5, Train loss 3.71, Train accuracy 17.87, Validation loss 3.92, Validation accuracy 20.50
+Epoch 6, Train loss 3.43, Train accuracy 22.48, Validation loss 3.63, Validation accuracy 22.48
+Epoch 7, Train loss 3.19, Train accuracy 26.61, Validation loss 3.78, Validation accuracy 27.13
+Epoch 8, Train loss 2.99, Train accuracy 30.15, Validation loss 3.39, Validation accuracy 30.44
+Epoch 9, Train loss 2.82, Train accuracy 33.50, Validation loss 5.48, Validation accuracy 32.05
+Epoch 10, Train loss 2.65, Train accuracy 36.75, Validation loss 2.95, Validation accuracy 35.49
+Epoch 11, Train loss 2.52, Train accuracy 39.33, Validation loss 2.92, Validation accuracy 38.55
+Epoch 12, Train loss 2.39, Train accuracy 42.06, Validation loss 2.67, Validation accuracy 39.13
+Epoch 13, Train loss 2.25, Train accuracy 44.63, Validation loss 2.60, Validation accuracy 40.82
+Epoch 14, Train loss 2.14, Train accuracy 47.00, Validation loss 2.68, Validation accuracy 40.83
+Epoch 15, Train loss 2.03, Train accuracy 49.34, Validation loss 2.76, Validation accuracy 42.18
+Epoch 16, Train loss 1.92, Train accuracy 51.67, Validation loss 2.65, Validation accuracy 41.68
+Epoch 17, Train loss 1.82, Train accuracy 53.79, Validation loss 2.92, Validation accuracy 43.54
+Epoch 18, Train loss 1.71, Train accuracy 56.26, Validation loss 2.82, Validation accuracy 41.04
+Epoch 19, Train loss 1.60, Train accuracy 58.37, Validation loss 2.79, Validation accuracy 43.83
+Epoch 20, Train loss 1.51, Train accuracy 60.50, Validation loss 2.58, Validation accuracy 45.29
+Epoch 21, Train loss 1.43, Train accuracy 62.13, Validation loss 3.31, Validation accuracy 39.22
+Epoch 22, Train loss 1.32, Train accuracy 64.65, Validation loss 2.45, Validation accuracy 46.14
+Epoch 23, Train loss 1.21, Train accuracy 67.14, Validation loss 2.72, Validation accuracy 45.25
+Epoch 24, Train loss 1.12, Train accuracy 69.22, Validation loss 2.92, Validation accuracy 43.85
+Epoch 25, Train loss 1.01, Train accuracy 71.88, Validation loss 2.56, Validation accuracy 45.68
+Epoch 26, Train loss 0.92, Train accuracy 73.96, Validation loss 2.69, Validation accuracy 46.41
+Epoch 27, Train loss 0.85, Train accuracy 75.73, Validation loss 2.82, Validation accuracy 45.55
+Epoch 28, Train loss 0.76, Train accuracy 78.12, Validation loss 2.75, Validation accuracy 46.07
+Epoch 29, Train loss 0.69, Train accuracy 79.98, Validation loss 3.22, Validation accuracy 44.81
+Epoch 30, Train loss 0.61, Train accuracy 82.00, Validation loss 2.99, Validation accuracy 44.42
+Epoch 31, Train loss 0.55, Train accuracy 83.73, Validation loss 3.90, Validation accuracy 45.43
+Epoch 32, Train loss 0.49, Train accuracy 85.43, Validation loss 3.95, Validation accuracy 44.08
+Epoch 33, Train loss 0.45, Train accuracy 86.55, Validation loss 3.19, Validation accuracy 46.93
+Epoch 34, Train loss 0.41, Train accuracy 87.78, Validation loss 3.07, Validation accuracy 47.42
+Epoch 35, Train loss 0.36, Train accuracy 89.10, Validation loss 3.38, Validation accuracy 46.31
+Epoch 36, Train loss 0.33, Train accuracy 89.93, Validation loss 3.12, Validation accuracy 46.96
+Epoch 37, Train loss 0.30, Train accuracy 90.84, Validation loss 3.26, Validation accuracy 46.00
+Epoch 38, Train loss 0.28, Train accuracy 91.66, Validation loss 3.21, Validation accuracy 46.84
+Epoch 39, Train loss 0.26, Train accuracy 92.24, Validation loss 3.29, Validation accuracy 46.64
+Epoch 40, Train loss 0.24, Train accuracy 92.77, Validation loss 3.48, Validation accuracy 46.98
+Epoch 41, Train loss 0.21, Train accuracy 93.52, Validation loss 3.46, Validation accuracy 47.47
+Epoch 42, Train loss 0.21, Train accuracy 93.78, Validation loss 3.30, Validation accuracy 47.98
+Epoch 43, Train loss 0.19, Train accuracy 94.31, Validation loss 3.40, Validation accuracy 47.73
+Epoch 44, Train loss 0.18, Train accuracy 94.49, Validation loss 3.47, Validation accuracy 47.76
+Epoch 45, Train loss 0.17, Train accuracy 94.88, Validation loss 3.55, Validation accuracy 47.67
+Epoch 46, Train loss 0.16, Train accuracy 95.13, Validation loss 3.51, Validation accuracy 48.12
+Epoch 47, Train loss 0.15, Train accuracy 95.44, Validation loss 3.74, Validation accuracy 47.37
+Epoch 48, Train loss 0.14, Train accuracy 95.73, Validation loss 3.46, Validation accuracy 47.50
+Epoch 49, Train loss 0.14, Train accuracy 95.89, Validation loss 3.55, Validation accuracy 48.18
+Epoch 50, Train loss 0.13, Train accuracy 96.15, Validation loss 3.62, Validation accuracy 47.29
+Epoch 51, Train loss 0.13, Train accuracy 96.20, Validation loss 3.73, Validation accuracy 47.57
+Epoch 52, Train loss 0.12, Train accuracy 96.48, Validation loss 3.70, Validation accuracy 48.64
+Epoch 53, Train loss 0.11, Train accuracy 96.73, Validation loss 3.72, Validation accuracy 47.94
+Epoch 54, Train loss 0.10, Train accuracy 96.78, Validation loss 3.66, Validation accuracy 48.00
+Epoch 55, Train loss 0.10, Train accuracy 97.00, Validation loss 3.64, Validation accuracy 48.45
+Epoch 56, Train loss 0.10, Train accuracy 97.03, Validation loss 3.86, Validation accuracy 48.39
+Epoch 57, Train loss 0.09, Train accuracy 97.29, Validation loss 3.64, Validation accuracy 47.98
+Epoch 58, Train loss 0.09, Train accuracy 97.21, Validation loss 3.74, Validation accuracy 48.66
+Epoch 59, Train loss 0.09, Train accuracy 97.43, Validation loss 3.74, Validation accuracy 48.85
+Epoch 60, Train loss 0.08, Train accuracy 97.44, Validation loss 3.73, Validation accuracy 49.00
+Epoch 61, Train loss 0.08, Train accuracy 97.54, Validation loss 3.73, Validation accuracy 48.58
+Epoch 62, Train loss 0.08, Train accuracy 97.64, Validation loss 3.70, Validation accuracy 48.45
+Epoch 63, Train loss 0.08, Train accuracy 97.68, Validation loss 3.91, Validation accuracy 48.52
+Epoch 64, Train loss 0.08, Train accuracy 97.72, Validation loss 4.22, Validation accuracy 47.75
+Epoch 65, Train loss 0.07, Train accuracy 97.84, Validation loss 4.07, Validation accuracy 48.51
+Epoch 66, Train loss 0.07, Train accuracy 97.98, Validation loss 3.89, Validation accuracy 48.28
+Epoch 67, Train loss 0.07, Train accuracy 97.90, Validation loss 3.74, Validation accuracy 48.90
+Epoch 68, Train loss 0.06, Train accuracy 98.14, Validation loss 4.28, Validation accuracy 48.69
+Epoch 69, Train loss 0.07, Train accuracy 98.03, Validation loss 4.35, Validation accuracy 47.86
+Epoch 70, Train loss 0.06, Train accuracy 98.18, Validation loss 3.76, Validation accuracy 48.74
+Epoch 71, Train loss 0.06, Train accuracy 98.28, Validation loss 3.75, Validation accuracy 49.07
+Epoch 72, Train loss 0.06, Train accuracy 98.35, Validation loss 3.82, Validation accuracy 48.63
+Epoch 73, Train loss 0.06, Train accuracy 98.22, Validation loss 3.89, Validation accuracy 48.72
+Epoch 74, Train loss 0.05, Train accuracy 98.39, Validation loss 3.86, Validation accuracy 48.66
+Epoch 75, Train loss 0.05, Train accuracy 98.43, Validation loss 3.84, Validation accuracy 49.12
+Epoch 76, Train loss 0.05, Train accuracy 98.54, Validation loss 3.84, Validation accuracy 49.15
+Epoch 77, Train loss 0.05, Train accuracy 98.48, Validation loss 3.81, Validation accuracy 48.96
+Epoch 78, Train loss 0.05, Train accuracy 98.59, Validation loss 3.79, Validation accuracy 49.31
+Epoch 79, Train loss 0.05, Train accuracy 98.56, Validation loss 3.90, Validation accuracy 49.33
+Epoch 80, Train loss 0.04, Train accuracy 98.75, Validation loss 3.94, Validation accuracy 49.11
+Epoch 81, Train loss 0.05, Train accuracy 98.61, Validation loss 3.87, Validation accuracy 49.23
+Epoch 82, Train loss 0.05, Train accuracy 98.65, Validation loss 3.80, Validation accuracy 49.69
+Epoch 83, Train loss 0.04, Train accuracy 98.67, Validation loss 3.83, Validation accuracy 49.40
+Epoch 84, Train loss 0.04, Train accuracy 98.76, Validation loss 3.88, Validation accuracy 49.25
+Epoch 85, Train loss 0.04, Train accuracy 98.75, Validation loss 3.85, Validation accuracy 49.52
+Epoch 86, Train loss 0.04, Train accuracy 98.73, Validation loss 3.88, Validation accuracy 49.10
+Epoch 87, Train loss 0.04, Train accuracy 98.90, Validation loss 3.95, Validation accuracy 49.37
+Epoch 88, Train loss 0.04, Train accuracy 98.85, Validation loss 3.93, Validation accuracy 49.95
+Epoch 89, Train loss 0.04, Train accuracy 98.82, Validation loss 3.93, Validation accuracy 49.18
+Epoch 90, Train loss 0.04, Train accuracy 98.84, Validation loss 3.96, Validation accuracy 49.05
+Epoch 91, Train loss 0.04, Train accuracy 98.91, Validation loss 3.89, Validation accuracy 49.19
+Epoch 92, Train loss 0.04, Train accuracy 98.93, Validation loss 3.99, Validation accuracy 48.83
+Epoch 93, Train loss 0.04, Train accuracy 98.95, Validation loss 3.94, Validation accuracy 49.25
+Epoch 94, Train loss 0.04, Train accuracy 98.88, Validation loss 3.87, Validation accuracy 49.29
+Epoch 95, Train loss 0.04, Train accuracy 98.95, Validation loss 3.89, Validation accuracy 49.47
+Epoch 96, Train loss 0.03, Train accuracy 98.99, Validation loss 3.87, Validation accuracy 49.52
+Epoch 97, Train loss 0.03, Train accuracy 99.06, Validation loss 3.98, Validation accuracy 49.50
+Epoch 98, Train loss 0.03, Train accuracy 99.05, Validation loss 3.85, Validation accuracy 50.20
+Epoch 99, Train loss 0.03, Train accuracy 99.01, Validation loss 3.99, Validation accuracy 49.14
+Epoch 100, Train loss 0.03, Train accuracy 99.11, Validation loss 3.93, Validation accuracy 49.62
+Best Validation Accuracy 50.20, Epoch: 98, Training Time: 12909.34s
+
+Epoch 1, Train loss 5.28, Train accuracy 1.03, Validation loss 5.04, Validation accuracy 2.07
+Epoch 2, Train loss 4.82, Train accuracy 3.56, Validation loss 4.56, Validation accuracy 5.68
+Epoch 3, Train loss 4.27, Train accuracy 9.15, Validation loss 3.98, Validation accuracy 13.00
+Epoch 4, Train loss 3.78, Train accuracy 16.30, Validation loss 3.57, Validation accuracy 19.33
+Epoch 5, Train loss 3.45, Train accuracy 21.76, Validation loss 3.80, Validation accuracy 20.72
+Epoch 6, Train loss 3.22, Train accuracy 26.02, Validation loss 3.36, Validation accuracy 25.82
+Epoch 7, Train loss 3.01, Train accuracy 30.09, Validation loss 3.02, Validation accuracy 31.27
+Epoch 8, Train loss 2.81, Train accuracy 33.70, Validation loss 2.87, Validation accuracy 33.44
+Epoch 9, Train loss 2.66, Train accuracy 36.86, Validation loss 3.56, Validation accuracy 35.28
+Epoch 10, Train loss 2.51, Train accuracy 39.65, Validation loss 2.72, Validation accuracy 36.82
+Epoch 11, Train loss 2.38, Train accuracy 42.38, Validation loss 2.76, Validation accuracy 38.66
+Epoch 12, Train loss 2.25, Train accuracy 44.82, Validation loss 2.53, Validation accuracy 41.14
+Epoch 13, Train loss 2.13, Train accuracy 47.36, Validation loss 3.43, Validation accuracy 39.23
+Epoch 14, Train loss 2.02, Train accuracy 49.50, Validation loss 2.52, Validation accuracy 42.73
+Epoch 15, Train loss 1.90, Train accuracy 52.18, Validation loss 2.39, Validation accuracy 44.20
+Epoch 16, Train loss 1.80, Train accuracy 54.18, Validation loss 2.83, Validation accuracy 43.93
+Epoch 17, Train loss 1.69, Train accuracy 56.50, Validation loss 2.44, Validation accuracy 44.93
+Epoch 18, Train loss 1.59, Train accuracy 58.71, Validation loss 2.47, Validation accuracy 44.67
+Epoch 19, Train loss 1.48, Train accuracy 61.22, Validation loss 2.56, Validation accuracy 45.20
+Epoch 20, Train loss 1.37, Train accuracy 63.58, Validation loss 2.39, Validation accuracy 46.07
+Epoch 21, Train loss 1.26, Train accuracy 66.06, Validation loss 2.45, Validation accuracy 46.13
+Epoch 22, Train loss 1.17, Train accuracy 68.19, Validation loss 2.53, Validation accuracy 45.75
+Epoch 23, Train loss 1.06, Train accuracy 70.64, Validation loss 2.60, Validation accuracy 44.91
+Epoch 24, Train loss 0.96, Train accuracy 72.97, Validation loss 2.59, Validation accuracy 45.32
+Epoch 25, Train loss 0.87, Train accuracy 75.31, Validation loss 2.66, Validation accuracy 47.00
+Epoch 26, Train loss 0.79, Train accuracy 77.45, Validation loss 3.06, Validation accuracy 44.70
+Epoch 27, Train loss 0.70, Train accuracy 79.89, Validation loss 2.90, Validation accuracy 45.35
+Epoch 28, Train loss 0.63, Train accuracy 81.59, Validation loss 2.86, Validation accuracy 45.75
+Epoch 29, Train loss 0.56, Train accuracy 83.38, Validation loss 2.98, Validation accuracy 45.28
+Epoch 30, Train loss 0.50, Train accuracy 85.11, Validation loss 3.14, Validation accuracy 45.69
+Epoch 31, Train loss 0.44, Train accuracy 86.78, Validation loss 3.08, Validation accuracy 46.09
+Epoch 32, Train loss 0.40, Train accuracy 88.08, Validation loss 3.05, Validation accuracy 46.41
+Epoch 33, Train loss 0.37, Train accuracy 89.03, Validation loss 3.07, Validation accuracy 46.69
+Epoch 34, Train loss 0.32, Train accuracy 90.23, Validation loss 3.19, Validation accuracy 46.49
+Epoch 35, Train loss 0.30, Train accuracy 90.98, Validation loss 3.19, Validation accuracy 46.58
+Epoch 36, Train loss 0.27, Train accuracy 91.86, Validation loss 3.28, Validation accuracy 45.82
+Best Validation Accuracy 47.00, Epoch: 25, Training Time: 4683.12s

@@ -1,0 +1,42 @@
+==========================================================================================
+Layer (type:depth-idx)                   Output Shape              Param #
+==========================================================================================
+Sequential                               [1, 200]                  --
+├─Conv2d: 1-1                            [1, 96, 30, 30]           34,944
+├─ReLU: 1-2                              [1, 96, 30, 30]           --
+├─MaxPool2d: 1-3                         [1, 96, 14, 14]           --
+├─Conv2d: 1-4                            [1, 256, 14, 14]          614,656
+├─ReLU: 1-5                              [1, 256, 14, 14]          --
+├─MaxPool2d: 1-6                         [1, 256, 6, 6]            --
+├─Conv2d: 1-7                            [1, 384, 6, 6]            885,120
+├─ReLU: 1-8                              [1, 384, 6, 6]            --
+├─Conv2d: 1-9                            [1, 384, 6, 6]            1,327,488
+├─ReLU: 1-10                             [1, 384, 6, 6]            --
+├─Conv2d: 1-11                           [1, 256, 6, 6]            884,992
+├─ReLU: 1-12                             [1, 256, 6, 6]            --
+├─MaxPool2d: 1-13                        [1, 256, 2, 2]            --
+├─Flatten: 1-14                          [1, 1024]                 --
+├─Linear: 1-15                           [1, 4096]                 4,198,400
+├─ReLU: 1-16                             [1, 4096]                 --
+├─Dropout: 1-17                          [1, 4096]                 --
+├─Linear: 1-18                           [1, 4096]                 16,781,312
+├─ReLU: 1-19                             [1, 4096]                 --
+├─Dropout: 1-20                          [1, 4096]                 --
+├─Linear: 1-21                           [1, 200]                  819,400
+==========================================================================================
+Total params: 25,546,312
+Trainable params: 25,546,312
+Non-trainable params: 0
+Total mult-adds (Units.MEGABYTES): 285.23
+==========================================================================================
+Input size (MB): 0.20
+Forward/backward pass size (MB): 1.45
+Params size (MB): 102.19
+Estimated Total Size (MB): 103.84
+==========================================================================================
+
+Epoch 1, Train loss 5.09, Train accuracy 1.72, Validation loss 4.84, Validation accuracy 3.95
+Best Validation Accuracy 3.95, Epoch: 1, Training Time: 54.41s
+
+Epoch 1, Train loss 5.12, Train accuracy 1.57, Validation loss 4.89, Validation accuracy 3.37
+Best Validation Accuracy 3.37, Epoch: 1, Training Time: 50.72s

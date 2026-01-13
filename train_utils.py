@@ -3,9 +3,10 @@ from torch.utils.data import DataLoader
 import torch
 from torch import nn
 import time
+import datetime
 import os
 
-__all__ = ["load_data_tiny_imagenet", "init_weights", "evaluate_accuracy", "train_epoch", "train", "try_gpu"]
+__all__ = ["load_data_tiny_imagenet", "get_optimizer", "init_weights", "evaluate_accuracy", "train_epoch", "train", "try_gpu"]
 
 def load_data_tiny_imagenet(batch_size=128):
     """Load the tiny imagenet dataset."""
@@ -37,9 +38,12 @@ def load_data_tiny_imagenet(batch_size=128):
 
     return train_loader, val_loader
 
-def init_weights_random(m):
-    if type(m) == nn.Linear or type(m) == nn.Conv2d:
-        nn.init.uniform_(m.weight)
+def get_optimizer(net, opt_type):
+    if opt_type == "sgd": return torch.optim.SGD(net.parameters(), lr=0.1, momentum=0.9, nesterov=False)
+    elif opt_type == "sgd_nestrov": return torch.optim.SGD(net.parameters(), lr=0.1, momentum=0.9, nesterov=True)
+    elif opt_type == "adam": return torch.optim.Adam(net.parameters(), lr=1e-3)
+    elif opt_type == "adamw": return torch.optim.AdamW(net.parameters(), lr=1e-3)
+    else: return None
 
 def init_weights_xavier_uniform(m):
     if type(m) == nn.Linear or type(m) == nn.Conv2d:
@@ -59,12 +63,12 @@ def init_weights_kaiming_normal(m):
 
 def init_weights(mode):
     match mode:
-        case 'random': return init_weights_random
+        case 'default': return None
         case 'xavier_uniform': return init_weights_xavier_uniform
         case 'xavier_normal': return init_weights_xavier_normal
         case 'kaiming_uniform': return init_weights_kaiming_uniform
         case 'kaiming_normal': return init_weights_kaiming_normal
-        case _: return init_weights_random
+        case _: return None
 
 def evaluate_accuracy(net, data_iter, loss, device):
     """Compute the accuracy for a model on a dataset."""
@@ -156,7 +160,9 @@ def train(net, train_iter, val_iter, num_epochs, patience, loss, optimizer, weig
     best_val_accuracy = 0
     counter = 0
 
-    net.apply(init_weights(weight_init))
+    init_func = init_weights(weight_init)
+    if init_func is not None:
+        net.apply(init_func)
 
     net.to(device)
 
@@ -165,10 +171,8 @@ def train(net, train_iter, val_iter, num_epochs, patience, loss, optimizer, weig
     os.makedirs(dir_name, exist_ok=True)
 
     optimizer_name = type(optimizer).__name__
-    loss_name = type(loss).__name__
-    lr = str(optimizer.param_groups[0]['lr'])
 
-    stats_file_name = dir_name + weight_init + "_" + loss_name + "_" + optimizer_name + "_" + lr + ".txt"
+    stats_file_name = dir_name + optimizer_name + "_" + weight_init + ".txt"
     if not os.path.exists(stats_file_name) or delete_old_measurements:
         stats_file = open(stats_file_name, "w", encoding="utf-8")
         stats_file.write(str(net) + "\n\n")
@@ -181,7 +185,8 @@ def train(net, train_iter, val_iter, num_epochs, patience, loss, optimizer, weig
     scaler = torch.amp.GradScaler()
 
     for epoch in range(num_epochs):
-        print(f"Epoch {epoch + 1}")
+        current_time = datetime.datetime.now()
+        print(f"{current_time.strftime("%H:%M:%S")} Epoch {epoch + 1}")
 
         train_loss, train_acc = train_epoch_amp(net, train_iter, loss, optimizer, scaler, device)
         train_loss_all.append(train_loss)

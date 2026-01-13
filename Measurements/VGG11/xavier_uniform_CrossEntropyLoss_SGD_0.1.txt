@@ -1,0 +1,59 @@
+==========================================================================================
+Layer (type:depth-idx)                   Output Shape              Param #
+==========================================================================================
+Sequential                               [1, 200]                  --
+├─Sequential: 1-1                        [1, 64, 64, 64]           --
+│    └─Conv2d: 2-1                       [1, 64, 128, 128]         1,792
+│    └─ReLU: 2-2                         [1, 64, 128, 128]         --
+│    └─MaxPool2d: 2-3                    [1, 64, 64, 64]           --
+├─Sequential: 1-2                        [1, 128, 32, 32]          --
+│    └─Conv2d: 2-4                       [1, 128, 64, 64]          73,856
+│    └─ReLU: 2-5                         [1, 128, 64, 64]          --
+│    └─MaxPool2d: 2-6                    [1, 128, 32, 32]          --
+├─Sequential: 1-3                        [1, 256, 16, 16]          --
+│    └─Conv2d: 2-7                       [1, 256, 32, 32]          295,168
+│    └─ReLU: 2-8                         [1, 256, 32, 32]          --
+│    └─Conv2d: 2-9                       [1, 256, 32, 32]          590,080
+│    └─ReLU: 2-10                        [1, 256, 32, 32]          --
+│    └─MaxPool2d: 2-11                   [1, 256, 16, 16]          --
+├─Sequential: 1-4                        [1, 512, 8, 8]            --
+│    └─Conv2d: 2-12                      [1, 512, 16, 16]          1,180,160
+│    └─ReLU: 2-13                        [1, 512, 16, 16]          --
+│    └─Conv2d: 2-14                      [1, 512, 16, 16]          2,359,808
+│    └─ReLU: 2-15                        [1, 512, 16, 16]          --
+│    └─MaxPool2d: 2-16                   [1, 512, 8, 8]            --
+├─Sequential: 1-5                        [1, 512, 4, 4]            --
+│    └─Conv2d: 2-17                      [1, 512, 8, 8]            2,359,808
+│    └─ReLU: 2-18                        [1, 512, 8, 8]            --
+│    └─Conv2d: 2-19                      [1, 512, 8, 8]            2,359,808
+│    └─ReLU: 2-20                        [1, 512, 8, 8]            --
+│    └─MaxPool2d: 2-21                   [1, 512, 4, 4]            --
+├─Flatten: 1-6                           [1, 8192]                 --
+├─Linear: 1-7                            [1, 4096]                 33,558,528
+├─ReLU: 1-8                              [1, 4096]                 --
+├─Dropout: 1-9                           [1, 4096]                 --
+├─Linear: 1-10                           [1, 4096]                 16,781,312
+├─ReLU: 1-11                             [1, 4096]                 --
+├─Dropout: 1-12                          [1, 4096]                 --
+├─Linear: 1-13                           [1, 200]                  819,400
+==========================================================================================
+Total params: 60,379,720
+Trainable params: 60,379,720
+Non-trainable params: 0
+Total mult-adds (Units.GIGABYTES): 2.50
+==========================================================================================
+Input size (MB): 0.20
+Forward/backward pass size (MB): 19.47
+Params size (MB): 241.52
+Estimated Total Size (MB): 261.18
+==========================================================================================
+
+Epoch 1, Train loss 5.22, Train accuracy 0.95, Validation loss 5.13, Validation accuracy 2.32
+Best Validation Accuracy 2.32, Epoch: 1, Training Time: 191.46s
+
+
+Epoch 1, Train loss 5.26, Train accuracy 0.80, Validation loss 5.20, Validation accuracy 1.08
+Best Validation Accuracy 1.08, Epoch: 1, Training Time: 145.71s
+
+Epoch 1, Train loss 5.20, Train accuracy 1.07, Validation loss 5.19, Validation accuracy 1.30
+Best Validation Accuracy 1.30, Epoch: 1, Training Time: 145.76s

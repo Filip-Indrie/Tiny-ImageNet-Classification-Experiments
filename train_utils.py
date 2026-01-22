@@ -40,7 +40,7 @@ def load_data_tiny_imagenet(batch_size=128):
 
 def get_optimizer(net, opt_type):
     if opt_type == "sgd": return torch.optim.SGD(net.parameters(), lr=0.1, momentum=0.9, nesterov=False)
-    elif opt_type == "sgd_nestrov": return torch.optim.SGD(net.parameters(), lr=0.1, momentum=0.9, nesterov=True)
+    elif opt_type == "sgd_nesterov": return torch.optim.SGD(net.parameters(), lr=0.1, momentum=0.9, nesterov=True)
     elif opt_type == "adam": return torch.optim.Adam(net.parameters(), lr=1e-3)
     elif opt_type == "adamw": return torch.optim.AdamW(net.parameters(), lr=1e-3)
     else: return None

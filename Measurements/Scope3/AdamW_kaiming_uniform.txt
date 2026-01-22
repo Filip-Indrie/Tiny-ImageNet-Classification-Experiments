@@ -1,0 +1,159 @@
+==========================================================================================
+Layer (type:depth-idx)                   Output Shape              Param #
+==========================================================================================
+Sequential                               [1, 200]                  --
+├─Scope3Block: 1-1                       [1, 64, 64, 64]           --
+│    └─Sequential: 2-1                   [1, 64, 128, 128]         --
+│    │    └─Conv2d: 3-1                  [1, 64, 128, 128]         1,792
+│    │    └─BatchNorm2d: 3-2             [1, 64, 128, 128]         128
+│    │    └─ReLU: 3-3                    [1, 64, 128, 128]         --
+│    └─Sequential: 2-2                   [1, 64, 128, 128]         --
+│    │    └─Conv2d: 3-4                  [1, 64, 128, 128]         4,864
+│    │    └─BatchNorm2d: 3-5             [1, 64, 128, 128]         128
+│    │    └─ReLU: 3-6                    [1, 64, 128, 128]         --
+│    └─Sequential: 2-3                   [1, 64, 128, 128]         --
+│    │    └─Conv2d: 3-7                  [1, 64, 128, 128]         9,472
+│    │    └─BatchNorm2d: 3-8             [1, 64, 128, 128]         128
+│    │    └─ReLU: 3-9                    [1, 64, 128, 128]         --
+│    └─Conv2d: 2-4                       [1, 64, 64, 64]           12,352
+│    └─BatchNorm2d: 2-5                  [1, 64, 64, 64]           128
+│    └─Conv2d: 2-6                       [1, 64, 64, 64]           256
+│    └─BatchNorm2d: 2-7                  [1, 64, 64, 64]           128
+│    └─ReLU: 2-8                         [1, 64, 64, 64]           --
+├─Scope3Block: 1-2                       [1, 128, 32, 32]          --
+│    └─Sequential: 2-9                   [1, 128, 64, 64]          --
+│    │    └─Conv2d: 3-10                 [1, 128, 64, 64]          73,856
+│    │    └─BatchNorm2d: 3-11            [1, 128, 64, 64]          256
+│    │    └─ReLU: 3-12                   [1, 128, 64, 64]          --
+│    └─Sequential: 2-10                  [1, 128, 64, 64]          --
+│    │    └─Conv2d: 3-13                 [1, 128, 64, 64]          204,928
+│    │    └─BatchNorm2d: 3-14            [1, 128, 64, 64]          256
+│    │    └─ReLU: 3-15                   [1, 128, 64, 64]          --
+│    └─Sequential: 2-11                  [1, 128, 64, 64]          --
+│    │    └─Conv2d: 3-16                 [1, 128, 64, 64]          401,536
+│    │    └─BatchNorm2d: 3-17            [1, 128, 64, 64]          256
+│    │    └─ReLU: 3-18                   [1, 128, 64, 64]          --
+│    └─Conv2d: 2-12                      [1, 128, 32, 32]          49,280
+│    └─BatchNorm2d: 2-13                 [1, 128, 32, 32]          256
+│    └─Conv2d: 2-14                      [1, 128, 32, 32]          8,320
+│    └─BatchNorm2d: 2-15                 [1, 128, 32, 32]          256
+│    └─ReLU: 2-16                        [1, 128, 32, 32]          --
+├─Scope3Block: 1-3                       [1, 256, 16, 16]          --
+│    └─Sequential: 2-17                  [1, 256, 32, 32]          --
+│    │    └─Conv2d: 3-19                 [1, 256, 32, 32]          295,168
+│    │    └─BatchNorm2d: 3-20            [1, 256, 32, 32]          512
+│    │    └─ReLU: 3-21                   [1, 256, 32, 32]          --
+│    └─Sequential: 2-18                  [1, 256, 32, 32]          --
+│    │    └─Conv2d: 3-22                 [1, 256, 32, 32]          819,456
+│    │    └─BatchNorm2d: 3-23            [1, 256, 32, 32]          512
+│    │    └─ReLU: 3-24                   [1, 256, 32, 32]          --
+│    └─Sequential: 2-19                  [1, 256, 32, 32]          --
+│    │    └─Conv2d: 3-25                 [1, 256, 32, 32]          1,605,888
+│    │    └─BatchNorm2d: 3-26            [1, 256, 32, 32]          512
+│    │    └─ReLU: 3-27                   [1, 256, 32, 32]          --
+│    └─Conv2d: 2-20                      [1, 256, 16, 16]          196,864
+│    └─BatchNorm2d: 2-21                 [1, 256, 16, 16]          512
+│    └─Conv2d: 2-22                      [1, 256, 16, 16]          33,024
+│    └─BatchNorm2d: 2-23                 [1, 256, 16, 16]          512
+│    └─ReLU: 2-24                        [1, 256, 16, 16]          --
+├─Scope3Block: 1-4                       [1, 512, 8, 8]            --
+│    └─Sequential: 2-25                  [1, 512, 16, 16]          --
+│    │    └─Conv2d: 3-28                 [1, 512, 16, 16]          1,180,160
+│    │    └─BatchNorm2d: 3-29            [1, 512, 16, 16]          1,024
+│    │    └─ReLU: 3-30                   [1, 512, 16, 16]          --
+│    └─Sequential: 2-26                  [1, 512, 16, 16]          --
+│    │    └─Conv2d: 3-31                 [1, 512, 16, 16]          3,277,312
+│    │    └─BatchNorm2d: 3-32            [1, 512, 16, 16]          1,024
+│    │    └─ReLU: 3-33                   [1, 512, 16, 16]          --
+│    └─Sequential: 2-27                  [1, 512, 16, 16]          --
+│    │    └─Conv2d: 3-34                 [1, 512, 16, 16]          6,423,040
+│    │    └─BatchNorm2d: 3-35            [1, 512, 16, 16]          1,024
+│    │    └─ReLU: 3-36                   [1, 512, 16, 16]          --
+│    └─Conv2d: 2-28                      [1, 512, 8, 8]            786,944
+│    └─BatchNorm2d: 2-29                 [1, 512, 8, 8]            1,024
+│    └─Conv2d: 2-30                      [1, 512, 8, 8]            131,584
+│    └─BatchNorm2d: 2-31                 [1, 512, 8, 8]            1,024
+│    └─ReLU: 2-32                        [1, 512, 8, 8]            --
+├─Scope3Block: 1-5                       [1, 512, 4, 4]            --
+│    └─Sequential: 2-33                  [1, 512, 8, 8]            --
+│    │    └─Conv2d: 3-37                 [1, 512, 8, 8]            2,359,808
+│    │    └─BatchNorm2d: 3-38            [1, 512, 8, 8]            1,024
+│    │    └─ReLU: 3-39                   [1, 512, 8, 8]            --
+│    └─Sequential: 2-34                  [1, 512, 8, 8]            --
+│    │    └─Conv2d: 3-40                 [1, 512, 8, 8]            6,554,112
+│    │    └─BatchNorm2d: 3-41            [1, 512, 8, 8]            1,024
+│    │    └─ReLU: 3-42                   [1, 512, 8, 8]            --
+│    └─Sequential: 2-35                  [1, 512, 8, 8]            --
+│    │    └─Conv2d: 3-43                 [1, 512, 8, 8]            12,845,568
+│    │    └─BatchNorm2d: 3-44            [1, 512, 8, 8]            1,024
+│    │    └─ReLU: 3-45                   [1, 512, 8, 8]            --
+│    └─Conv2d: 2-36                      [1, 512, 4, 4]            786,944
+│    └─BatchNorm2d: 2-37                 [1, 512, 4, 4]            1,024
+│    └─Conv2d: 2-38                      [1, 512, 4, 4]            262,656
+│    └─BatchNorm2d: 2-39                 [1, 512, 4, 4]            1,024
+│    └─ReLU: 2-40                        [1, 512, 4, 4]            --
+├─AdaptiveAvgPool2d: 1-6                 [1, 512, 1, 1]            --
+├─Flatten: 1-7                           [1, 512]                  --
+├─Linear: 1-8                            [1, 200]                  102,600
+==========================================================================================
+Total params: 38,442,504
+Trainable params: 38,442,504
+Non-trainable params: 0
+Total mult-adds (Units.GIGABYTES): 10.26
+==========================================================================================
+Input size (MB): 0.20
+Forward/backward pass size (MB): 111.94
+Params size (MB): 153.77
+Estimated Total Size (MB): 265.90
+==========================================================================================
+
+Epoch 1, Train loss 4.24, Train accuracy 11.44, Validation loss 3.66, Validation accuracy 18.99
+Epoch 2, Train loss 3.26, Train accuracy 25.69, Validation loss 2.96, Validation accuracy 30.68
+Epoch 3, Train loss 2.76, Train accuracy 34.62, Validation loss 2.69, Validation accuracy 36.72
+Epoch 4, Train loss 2.40, Train accuracy 41.59, Validation loss 2.52, Validation accuracy 39.48
+Epoch 5, Train loss 2.12, Train accuracy 47.62, Validation loss 2.29, Validation accuracy 45.62
+Epoch 6, Train loss 1.86, Train accuracy 52.79, Validation loss 2.17, Validation accuracy 47.51
+Epoch 7, Train loss 1.63, Train accuracy 58.19, Validation loss 2.22, Validation accuracy 47.97
+Epoch 8, Train loss 1.41, Train accuracy 63.19, Validation loss 2.18, Validation accuracy 49.19
+Epoch 9, Train loss 1.20, Train accuracy 68.03, Validation loss 2.17, Validation accuracy 50.11
+Epoch 10, Train loss 1.00, Train accuracy 72.81, Validation loss 2.24, Validation accuracy 49.87
+Epoch 11, Train loss 0.83, Train accuracy 77.03, Validation loss 2.33, Validation accuracy 49.60
+Epoch 12, Train loss 0.69, Train accuracy 80.58, Validation loss 2.34, Validation accuracy 50.72
+Epoch 13, Train loss 0.57, Train accuracy 83.67, Validation loss 2.43, Validation accuracy 50.39
+Epoch 14, Train loss 0.50, Train accuracy 85.52, Validation loss 2.50, Validation accuracy 50.16
+Epoch 15, Train loss 0.44, Train accuracy 87.43, Validation loss 2.59, Validation accuracy 49.86
+Epoch 16, Train loss 0.40, Train accuracy 88.27, Validation loss 2.67, Validation accuracy 50.03
+Epoch 17, Train loss 0.36, Train accuracy 89.41, Validation loss 2.74, Validation accuracy 49.36
+Epoch 18, Train loss 0.33, Train accuracy 90.17, Validation loss 2.75, Validation accuracy 50.21
+Epoch 19, Train loss 0.31, Train accuracy 90.78, Validation loss 2.82, Validation accuracy 49.94
+Epoch 20, Train loss 0.30, Train accuracy 91.20, Validation loss 2.77, Validation accuracy 50.62
+Epoch 21, Train loss 0.28, Train accuracy 91.78, Validation loss 2.78, Validation accuracy 50.66
+Epoch 22, Train loss 0.26, Train accuracy 92.35, Validation loss 2.88, Validation accuracy 50.22
+Epoch 23, Train loss 0.25, Train accuracy 92.70, Validation loss 2.84, Validation accuracy 50.85
+Epoch 24, Train loss 0.25, Train accuracy 92.71, Validation loss 2.86, Validation accuracy 50.68
+Epoch 25, Train loss 0.23, Train accuracy 93.18, Validation loss 2.93, Validation accuracy 49.92
+Epoch 26, Train loss 0.23, Train accuracy 93.18, Validation loss 2.85, Validation accuracy 50.52
+Epoch 27, Train loss 0.22, Train accuracy 93.53, Validation loss 2.93, Validation accuracy 50.88
+Epoch 28, Train loss 0.21, Train accuracy 93.78, Validation loss 3.01, Validation accuracy 49.51
+Epoch 29, Train loss 0.21, Train accuracy 93.86, Validation loss 2.95, Validation accuracy 50.06
+Epoch 30, Train loss 0.20, Train accuracy 94.20, Validation loss 2.94, Validation accuracy 50.06
+Epoch 31, Train loss 0.19, Train accuracy 94.19, Validation loss 2.95, Validation accuracy 50.55
+Epoch 32, Train loss 0.19, Train accuracy 94.29, Validation loss 2.97, Validation accuracy 50.69
+Epoch 33, Train loss 0.18, Train accuracy 94.59, Validation loss 2.97, Validation accuracy 50.45
+Epoch 34, Train loss 0.18, Train accuracy 94.67, Validation loss 3.00, Validation accuracy 49.92
+Epoch 35, Train loss 0.18, Train accuracy 94.80, Validation loss 2.99, Validation accuracy 50.93
+Epoch 36, Train loss 0.17, Train accuracy 95.00, Validation loss 3.03, Validation accuracy 49.75
+Epoch 37, Train loss 0.17, Train accuracy 94.84, Validation loss 2.96, Validation accuracy 51.02
+Epoch 38, Train loss 0.16, Train accuracy 95.15, Validation loss 3.00, Validation accuracy 51.05
+Epoch 39, Train loss 0.17, Train accuracy 95.07, Validation loss 3.09, Validation accuracy 50.10
+Epoch 40, Train loss 0.16, Train accuracy 95.24, Validation loss 3.06, Validation accuracy 49.80
+Epoch 41, Train loss 0.16, Train accuracy 95.31, Validation loss 3.05, Validation accuracy 50.92
+Epoch 42, Train loss 0.16, Train accuracy 95.35, Validation loss 3.15, Validation accuracy 49.93
+Epoch 43, Train loss 0.15, Train accuracy 95.56, Validation loss 3.02, Validation accuracy 50.78
+Epoch 44, Train loss 0.15, Train accuracy 95.46, Validation loss 3.10, Validation accuracy 49.50
+Epoch 45, Train loss 0.15, Train accuracy 95.61, Validation loss 3.04, Validation accuracy 50.71
+Epoch 46, Train loss 0.14, Train accuracy 95.68, Validation loss 3.08, Validation accuracy 50.52
+Epoch 47, Train loss 0.15, Train accuracy 95.71, Validation loss 3.05, Validation accuracy 50.78
+Epoch 48, Train loss 0.14, Train accuracy 95.80, Validation loss 3.20, Validation accuracy 50.27
+Epoch 49, Train loss 0.14, Train accuracy 95.81, Validation loss 3.16, Validation accuracy 50.52
+Best Validation Accuracy 51.05, Epoch: 38, Training Time: 20503.71s

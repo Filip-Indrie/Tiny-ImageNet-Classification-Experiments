@@ -2,22 +2,22 @@ from train_utils import *
 from models import *
 import torch
 
-torch.manual_seed(42)
+torch.manual_seed(50)
 
 if __name__ == "__main__":
 
     nets = [
-        AlexNet(),
-        VGG11(),
-        ResNet18(),
-        ResNet34(),
-        ResNet50(),
-        Scope2(),
-        Scope3(),
-        Scope2Atrous(),
-        Scope3Atrous(),
-        ShallowBottleNet(),
-        BottleNet(),
+        # AlexNet(),
+        # VGG11(),
+        # ResNet18(),
+        # ResNet34(),
+        # ResNet50(),
+        # Scope2(),
+        # Scope3(),
+        # Scope2Atrous(),
+        # Scope3Atrous(),
+        # ShallowBottleNet(),
+        # BottleNet(),
         DeepBottleNet(),
         DeeperBottleNet()
     ]
@@ -25,7 +25,6 @@ if __name__ == "__main__":
     batch_size = 64
     num_epochs = 100
     patience = 10
-    lr = 0.1
 
     loss = torch.nn.CrossEntropyLoss()
 

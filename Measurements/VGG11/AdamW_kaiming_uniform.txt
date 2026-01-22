@@ -1,0 +1,63 @@
+==========================================================================================
+Layer (type:depth-idx)                   Output Shape              Param #
+==========================================================================================
+Sequential                               [1, 200]                  --
+├─Sequential: 1-1                        [1, 64, 64, 64]           --
+│    └─Conv2d: 2-1                       [1, 64, 128, 128]         1,792
+│    └─ReLU: 2-2                         [1, 64, 128, 128]         --
+│    └─MaxPool2d: 2-3                    [1, 64, 64, 64]           --
+├─Sequential: 1-2                        [1, 128, 32, 32]          --
+│    └─Conv2d: 2-4                       [1, 128, 64, 64]          73,856
+│    └─ReLU: 2-5                         [1, 128, 64, 64]          --
+│    └─MaxPool2d: 2-6                    [1, 128, 32, 32]          --
+├─Sequential: 1-3                        [1, 256, 16, 16]          --
+│    └─Conv2d: 2-7                       [1, 256, 32, 32]          295,168
+│    └─ReLU: 2-8                         [1, 256, 32, 32]          --
+│    └─Conv2d: 2-9                       [1, 256, 32, 32]          590,080
+│    └─ReLU: 2-10                        [1, 256, 32, 32]          --
+│    └─MaxPool2d: 2-11                   [1, 256, 16, 16]          --
+├─Sequential: 1-4                        [1, 512, 8, 8]            --
+│    └─Conv2d: 2-12                      [1, 512, 16, 16]          1,180,160
+│    └─ReLU: 2-13                        [1, 512, 16, 16]          --
+│    └─Conv2d: 2-14                      [1, 512, 16, 16]          2,359,808
+│    └─ReLU: 2-15                        [1, 512, 16, 16]          --
+│    └─MaxPool2d: 2-16                   [1, 512, 8, 8]            --
+├─Sequential: 1-5                        [1, 512, 4, 4]            --
+│    └─Conv2d: 2-17                      [1, 512, 8, 8]            2,359,808
+│    └─ReLU: 2-18                        [1, 512, 8, 8]            --
+│    └─Conv2d: 2-19                      [1, 512, 8, 8]            2,359,808
+│    └─ReLU: 2-20                        [1, 512, 8, 8]            --
+│    └─MaxPool2d: 2-21                   [1, 512, 4, 4]            --
+├─Flatten: 1-6                           [1, 8192]                 --
+├─Linear: 1-7                            [1, 4096]                 33,558,528
+├─ReLU: 1-8                              [1, 4096]                 --
+├─Dropout: 1-9                           [1, 4096]                 --
+├─Linear: 1-10                           [1, 4096]                 16,781,312
+├─ReLU: 1-11                             [1, 4096]                 --
+├─Dropout: 1-12                          [1, 4096]                 --
+├─Linear: 1-13                           [1, 200]                  819,400
+==========================================================================================
+Total params: 60,379,720
+Trainable params: 60,379,720
+Non-trainable params: 0
+Total mult-adds (Units.GIGABYTES): 2.50
+==========================================================================================
+Input size (MB): 0.20
+Forward/backward pass size (MB): 19.47
+Params size (MB): 241.52
+Estimated Total Size (MB): 261.18
+==========================================================================================
+
+Epoch 1, Train loss 5.34, Train accuracy 0.44, Validation loss 5.30, Validation accuracy 0.50
+Epoch 2, Train loss 5.30, Train accuracy 0.45, Validation loss 5.30, Validation accuracy 0.50
+Epoch 3, Train loss 5.30, Train accuracy 0.39, Validation loss 5.30, Validation accuracy 0.50
+Epoch 4, Train loss 5.30, Train accuracy 0.45, Validation loss 5.30, Validation accuracy 0.50
+Epoch 5, Train loss 5.30, Train accuracy 0.43, Validation loss 5.30, Validation accuracy 0.50
+Epoch 6, Train loss 5.30, Train accuracy 0.43, Validation loss 5.30, Validation accuracy 0.50
+Epoch 7, Train loss 5.30, Train accuracy 0.39, Validation loss 5.30, Validation accuracy 0.50
+Epoch 8, Train loss 5.30, Train accuracy 0.43, Validation loss 5.30, Validation accuracy 0.50
+Epoch 9, Train loss 5.30, Train accuracy 0.45, Validation loss 5.30, Validation accuracy 0.50
+Epoch 10, Train loss 5.30, Train accuracy 0.43, Validation loss 5.30, Validation accuracy 0.50
+Epoch 11, Train loss 5.30, Train accuracy 0.43, Validation loss 5.30, Validation accuracy 0.50
+Epoch 12, Train loss 5.30, Train accuracy 0.43, Validation loss 5.30, Validation accuracy 0.50
+Best Validation Accuracy 0.50, Epoch: 1, Training Time: 1891.85s

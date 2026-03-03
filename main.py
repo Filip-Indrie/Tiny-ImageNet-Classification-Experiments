@@ -18,8 +18,10 @@ if __name__ == "__main__":
         # Scope3Atrous(),
         # ShallowBottleNet(),
         # BottleNet(),
-        DeepBottleNet(),
-        DeeperBottleNet()
+        # DeepBottleNet(),
+        # DeeperBottleNet()
+        DilatedHeadNet(),
+        MultiHeadNet()
     ]
 
     batch_size = 64
@@ -45,4 +47,5 @@ if __name__ == "__main__":
     for net in nets:
         opt = get_optimizer(net, optimizer)
         print(type(net).__name__)
-        train(net, train_iter, val_iter, num_epochs, patience, loss, opt, weight_init, device)
+        print(net)
+        # train(net, train_iter, val_iter, num_epochs, patience, loss, opt, weight_init, device)

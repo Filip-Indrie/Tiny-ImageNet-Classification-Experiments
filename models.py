@@ -3,7 +3,9 @@ from torch import nn
 from torchinfo import summary
 from abc import ABC
 
-__all__ = ["AlexNet", "VGG11", "ResNet18", "ResNet34", "ResNet50", "Scope2", "Scope3", "Scope2Atrous", "Scope3Atrous", "ShallowBottleNet", "BottleNet", "DeepBottleNet", "DeeperBottleNet"]
+__all__ = ["AlexNet", "VGG11", "ResNet18", "ResNet34", "ResNet50", "Scope2", "Scope3",
+           "Scope2Atrous", "Scope3Atrous", "ShallowBottleNet", "BottleNet", "DeepBottleNet", "DeeperBottleNet",
+           "DilatedHeadNet", "MultiHeadNet"]
 
 class CustomModel(nn.Module, ABC):
     """
@@ -396,26 +398,26 @@ class Scope3Atrous(CustomModel):
 
 
 class BottleneckBlock(nn.Module):
-    def __init__(self, in_channels, out_channels, bottleneck, num_convs, stride=1):
+    def __init__(self, in_channels, out_channels, bottleneck, num_convs, stride=1, dilation=1):
         super(BottleneckBlock, self).__init__()
 
-        self.conv1 = nn.Conv2d(in_channels, out_channels // bottleneck, kernel_size=1, stride=1, padding=0)
+        self.conv1 = nn.Conv2d(in_channels, out_channels // bottleneck, kernel_size=1, stride=1, padding=0, dilation=1)
         self.bn1 = nn.BatchNorm2d(out_channels // bottleneck)
 
-        self.conv2 = nn.Conv2d(out_channels // bottleneck, out_channels // bottleneck, kernel_size=3, stride=stride, padding=1)
+        self.conv2 = nn.Conv2d(out_channels // bottleneck, out_channels // bottleneck, kernel_size=3, stride=stride, padding=3//2*dilation, dilation=dilation)
         self.bn2 = nn.BatchNorm2d(out_channels // bottleneck)
 
         convs = []
         for _ in range(num_convs - 1):
-            convs += [nn.Conv2d(out_channels // bottleneck, out_channels // bottleneck, kernel_size=3, stride=1, padding=1), nn.BatchNorm2d(out_channels // bottleneck), nn.ReLU()]
+            convs += [nn.Conv2d(out_channels // bottleneck, out_channels // bottleneck, kernel_size=3, stride=1, padding=3//2*dilation, dilation=dilation), nn.BatchNorm2d(out_channels // bottleneck), nn.ReLU()]
         self.convs = nn.Sequential(*convs)
 
-        self.conv3 = nn.Conv2d(out_channels // bottleneck, out_channels, kernel_size=1, stride=1, padding=0)
+        self.conv3 = nn.Conv2d(out_channels // bottleneck, out_channels, kernel_size=1, stride=1, padding=0, dilation=1)
         self.bn3 = nn.BatchNorm2d(out_channels)
 
         if stride != 1 or in_channels != out_channels:
             self.downsample = nn.Sequential(
-                nn.Conv2d(in_channels, out_channels, kernel_size=1, stride=stride),
+                nn.Conv2d(in_channels, out_channels, kernel_size=1, stride=stride, dilation=1),
                 nn.BatchNorm2d(out_channels)
             )
         else:
@@ -436,16 +438,16 @@ class BottleneckBlock(nn.Module):
         return self.act(out + residual)
 
 
-def bottleneck_stage(in_channels, out_channels, bottleneck, num_blocks, num_convs, first_block=False):
+def bottleneck_stage(in_channels, out_channels, bottleneck, num_blocks, num_convs, dilation=1, maintain_resolution=False):
     blk = []
     for i in range(num_blocks):
         if i == 0:
-            if first_block:
-                blk.append(BottleneckBlock(in_channels, out_channels, bottleneck, num_convs, stride=1))
+            if maintain_resolution:
+                blk.append(BottleneckBlock(in_channels, out_channels, bottleneck, num_convs, stride=1, dilation=dilation))
             else:
-                blk.append(BottleneckBlock(in_channels, out_channels, bottleneck, num_convs, stride=2))
+                blk.append(BottleneckBlock(in_channels, out_channels, bottleneck, num_convs, stride=2, dilation=dilation))
         else:
-            blk.append(BottleneckBlock(out_channels, out_channels, bottleneck, num_convs, stride=1))
+            blk.append(BottleneckBlock(out_channels, out_channels, bottleneck, num_convs, stride=1, dilation=dilation))
 
     return nn.Sequential(*blk)
 
@@ -462,7 +464,7 @@ class ShallowBottleNet(CustomModel):
             nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
         )
 
-        b1 = bottleneck_stage(64, 128, 4, 2, 1, first_block=True)
+        b1 = bottleneck_stage(64, 128, 4, 2, 1, maintain_resolution=True)
         b2 = bottleneck_stage(128, 256, 4, 3, 1)
         b3 = bottleneck_stage(256, 512, 4, 4, 1)
         b4 = bottleneck_stage(512, 1024, 2, 2, 1)
@@ -487,7 +489,7 @@ class BottleNet(CustomModel): # haha, u get it? Bottleneck <--> BottleNet :)))))
             nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
         )
 
-        b1 = bottleneck_stage(64, 256, 4, 3, 1, first_block=True)
+        b1 = bottleneck_stage(64, 256, 4, 3, 1, maintain_resolution=True)
         b2 = bottleneck_stage(256, 512, 4, 4, 1)
         b3 = bottleneck_stage(512, 1024, 2, 6, 1)
         b4 = bottleneck_stage(1024, 2048, 2, 3, 1)
@@ -512,7 +514,7 @@ class DeepBottleNet(CustomModel):
             nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
         )
 
-        b1 = bottleneck_stage(64, 256, 4, 3, 1, first_block=True)
+        b1 = bottleneck_stage(64, 256, 4, 3, 1, maintain_resolution=True)
         b2 = bottleneck_stage(256, 512, 4, 4, 1)
         b3 = bottleneck_stage(512, 1024, 2, 6, 2)
         b4 = bottleneck_stage(1024, 2048, 2, 3, 2)
@@ -535,7 +537,7 @@ class DeeperBottleNet(CustomModel):
             nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
         )
 
-        b1 = bottleneck_stage(64, 256, 4, 3, 2, first_block=True)
+        b1 = bottleneck_stage(64, 256, 4, 3, 2, maintain_resolution=True)
         b2 = bottleneck_stage(256, 512, 4, 4, 2)
         b3 = bottleneck_stage(512, 1024, 2, 6, 3)
         b4 = bottleneck_stage(1024, 2048, 2, 3, 3)
@@ -546,3 +548,88 @@ class DeeperBottleNet(CustomModel):
             nn.Flatten(),
             nn.Linear(2048, 200),
         )
+
+
+
+class DilatedHeadNet(CustomModel):
+    def __init__(self):
+        super(DilatedHeadNet, self).__init__()
+
+        stem = nn.Sequential(
+            nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+        )
+
+        b1 = bottleneck_stage(64, 128, 4, 3, 1, maintain_resolution=True)
+        b2 = bottleneck_stage(128, 256, 4, 4, 1)
+        b3 = bottleneck_stage(256, 512, 4, 2, 1, dilation=2, maintain_resolution=True)
+        b4 = bottleneck_stage(512, 1024, 4, 2, 1, dilation=4, maintain_resolution=True)
+        b5 = bottleneck_stage(1024, 1024, 2, 2, 1, dilation=6, maintain_resolution=True)
+
+        self._net = nn.Sequential(
+            stem, b1, b2, b3, b4, b5,
+            nn.AdaptiveAvgPool2d((1, 1)),
+            nn.Flatten(),
+            nn.Linear(1024, 200)
+        )
+
+class MultiheadBlock(nn.Module):
+    def __init__(self, in_channels, out_channels):
+        super(MultiheadBlock, self).__init__()
+
+        self.conv1 = nn.Conv2d(in_channels, out_channels, kernel_size=1, stride=1, padding=0)
+        self.bn1 = nn.BatchNorm2d(out_channels)
+
+        self.conv2 = nn.Conv2d(in_channels, out_channels, kernel_size=3, stride=1, padding=3//2*2, dilation=2)
+        self.bn2 = nn.BatchNorm2d(out_channels)
+
+        self.conv3 = nn.Conv2d(in_channels, out_channels, kernel_size=3, stride=1, padding=3//2*4, dilation=4)
+        self.bn3 = nn.BatchNorm2d(out_channels)
+
+        self.conv4 = nn.Conv2d(in_channels, out_channels, kernel_size=3, stride=1, padding=3//2*6, dilation=6)
+        self.bn4 = nn.BatchNorm2d(out_channels)
+
+        self.act = nn.ReLU()
+
+    def forward(self, x):
+        a = self.bn1(self.conv1(x))
+        b = self.bn2(self.conv2(x))
+        c = self.bn3(self.conv3(x))
+        d = self.bn4(self.conv4(x))
+
+        concat = torch.cat([a, b, c, d], dim=1)
+
+        return self.act(concat)
+
+
+class MultiHeadNet(CustomModel):
+    def __init__(self):
+        super(MultiHeadNet, self).__init__()
+
+        stem = nn.Sequential(
+            nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+        )
+
+        b1 = bottleneck_stage(64, 128, 4, 3, 1, maintain_resolution=True)
+        b2 = bottleneck_stage(128, 256, 4, 4, 1)
+        b3 = bottleneck_stage(256, 512, 2, 6, 3, maintain_resolution=True)
+        multihead = MultiheadBlock(512, 512)
+
+        self._net = nn.Sequential(
+            stem, b1, b2, b3, multihead,
+            nn.Conv2d(2048, 512, kernel_size=1, stride=1, padding=0, dilation=1),
+            nn.BatchNorm2d(512),
+            nn.ReLU(),
+            nn.AdaptiveAvgPool2d((1, 1)),
+            nn.Flatten(),
+            nn.Linear(512, 200)
+        )
+
+if __name__ == "__main__":
+    net = MultiHeadNet()
+    print(net)

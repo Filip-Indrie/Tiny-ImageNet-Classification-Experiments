@@ -1,0 +1,210 @@
+==========================================================================================
+Layer (type:depth-idx)                   Output Shape              Param #
+==========================================================================================
+Sequential                               [1, 200]                  --
+├─Sequential: 1-1                        [1, 64, 32, 32]           --
+│    └─Conv2d: 2-1                       [1, 64, 64, 64]           9,472
+│    └─BatchNorm2d: 2-2                  [1, 64, 64, 64]           128
+│    └─ReLU: 2-3                         [1, 64, 64, 64]           --
+│    └─MaxPool2d: 2-4                    [1, 64, 32, 32]           --
+├─Sequential: 1-2                        [1, 128, 32, 32]          --
+│    └─BottleneckBlock: 2-5              [1, 128, 32, 32]          --
+│    │    └─Conv2d: 3-1                  [1, 32, 32, 32]           2,080
+│    │    └─BatchNorm2d: 3-2             [1, 32, 32, 32]           64
+│    │    └─ReLU: 3-3                    [1, 32, 32, 32]           --
+│    │    └─Conv2d: 3-4                  [1, 32, 32, 32]           9,248
+│    │    └─BatchNorm2d: 3-5             [1, 32, 32, 32]           64
+│    │    └─ReLU: 3-6                    [1, 32, 32, 32]           --
+│    │    └─Sequential: 3-7              [1, 32, 32, 32]           --
+│    │    └─Conv2d: 3-8                  [1, 128, 32, 32]          4,224
+│    │    └─BatchNorm2d: 3-9             [1, 128, 32, 32]          256
+│    │    └─Sequential: 3-10             [1, 128, 32, 32]          8,576
+│    │    └─ReLU: 3-11                   [1, 128, 32, 32]          --
+│    └─BottleneckBlock: 2-6              [1, 128, 32, 32]          --
+│    │    └─Conv2d: 3-12                 [1, 32, 32, 32]           4,128
+│    │    └─BatchNorm2d: 3-13            [1, 32, 32, 32]           64
+│    │    └─ReLU: 3-14                   [1, 32, 32, 32]           --
+│    │    └─Conv2d: 3-15                 [1, 32, 32, 32]           9,248
+│    │    └─BatchNorm2d: 3-16            [1, 32, 32, 32]           64
+│    │    └─ReLU: 3-17                   [1, 32, 32, 32]           --
+│    │    └─Sequential: 3-18             [1, 32, 32, 32]           --
+│    │    └─Conv2d: 3-19                 [1, 128, 32, 32]          4,224
+│    │    └─BatchNorm2d: 3-20            [1, 128, 32, 32]          256
+│    │    └─ReLU: 3-21                   [1, 128, 32, 32]          --
+│    └─BottleneckBlock: 2-7              [1, 128, 32, 32]          --
+│    │    └─Conv2d: 3-22                 [1, 32, 32, 32]           4,128
+│    │    └─BatchNorm2d: 3-23            [1, 32, 32, 32]           64
+│    │    └─ReLU: 3-24                   [1, 32, 32, 32]           --
+│    │    └─Conv2d: 3-25                 [1, 32, 32, 32]           9,248
+│    │    └─BatchNorm2d: 3-26            [1, 32, 32, 32]           64
+│    │    └─ReLU: 3-27                   [1, 32, 32, 32]           --
+│    │    └─Sequential: 3-28             [1, 32, 32, 32]           --
+│    │    └─Conv2d: 3-29                 [1, 128, 32, 32]          4,224
+│    │    └─BatchNorm2d: 3-30            [1, 128, 32, 32]          256
+│    │    └─ReLU: 3-31                   [1, 128, 32, 32]          --
+├─Sequential: 1-3                        [1, 256, 16, 16]          --
+│    └─BottleneckBlock: 2-8              [1, 256, 16, 16]          --
+│    │    └─Conv2d: 3-32                 [1, 64, 32, 32]           8,256
+│    │    └─BatchNorm2d: 3-33            [1, 64, 32, 32]           128
+│    │    └─ReLU: 3-34                   [1, 64, 32, 32]           --
+│    │    └─Conv2d: 3-35                 [1, 64, 16, 16]           36,928
+│    │    └─BatchNorm2d: 3-36            [1, 64, 16, 16]           128
+│    │    └─ReLU: 3-37                   [1, 64, 16, 16]           --
+│    │    └─Sequential: 3-38             [1, 64, 16, 16]           --
+│    │    └─Conv2d: 3-39                 [1, 256, 16, 16]          16,640
+│    │    └─BatchNorm2d: 3-40            [1, 256, 16, 16]          512
+│    │    └─Sequential: 3-41             [1, 256, 16, 16]          33,536
+│    │    └─ReLU: 3-42                   [1, 256, 16, 16]          --
+│    └─BottleneckBlock: 2-9              [1, 256, 16, 16]          --
+│    │    └─Conv2d: 3-43                 [1, 64, 16, 16]           16,448
+│    │    └─BatchNorm2d: 3-44            [1, 64, 16, 16]           128
+│    │    └─ReLU: 3-45                   [1, 64, 16, 16]           --
+│    │    └─Conv2d: 3-46                 [1, 64, 16, 16]           36,928
+│    │    └─BatchNorm2d: 3-47            [1, 64, 16, 16]           128
+│    │    └─ReLU: 3-48                   [1, 64, 16, 16]           --
+│    │    └─Sequential: 3-49             [1, 64, 16, 16]           --
+│    │    └─Conv2d: 3-50                 [1, 256, 16, 16]          16,640
+│    │    └─BatchNorm2d: 3-51            [1, 256, 16, 16]          512
+│    │    └─ReLU: 3-52                   [1, 256, 16, 16]          --
+│    └─BottleneckBlock: 2-10             [1, 256, 16, 16]          --
+│    │    └─Conv2d: 3-53                 [1, 64, 16, 16]           16,448
+│    │    └─BatchNorm2d: 3-54            [1, 64, 16, 16]           128
+│    │    └─ReLU: 3-55                   [1, 64, 16, 16]           --
+│    │    └─Conv2d: 3-56                 [1, 64, 16, 16]           36,928
+│    │    └─BatchNorm2d: 3-57            [1, 64, 16, 16]           128
+│    │    └─ReLU: 3-58                   [1, 64, 16, 16]           --
+│    │    └─Sequential: 3-59             [1, 64, 16, 16]           --
+│    │    └─Conv2d: 3-60                 [1, 256, 16, 16]          16,640
+│    │    └─BatchNorm2d: 3-61            [1, 256, 16, 16]          512
+│    │    └─ReLU: 3-62                   [1, 256, 16, 16]          --
+│    └─BottleneckBlock: 2-11             [1, 256, 16, 16]          --
+│    │    └─Conv2d: 3-63                 [1, 64, 16, 16]           16,448
+│    │    └─BatchNorm2d: 3-64            [1, 64, 16, 16]           128
+│    │    └─ReLU: 3-65                   [1, 64, 16, 16]           --
+│    │    └─Conv2d: 3-66                 [1, 64, 16, 16]           36,928
+│    │    └─BatchNorm2d: 3-67            [1, 64, 16, 16]           128
+│    │    └─ReLU: 3-68                   [1, 64, 16, 16]           --
+│    │    └─Sequential: 3-69             [1, 64, 16, 16]           --
+│    │    └─Conv2d: 3-70                 [1, 256, 16, 16]          16,640
+│    │    └─BatchNorm2d: 3-71            [1, 256, 16, 16]          512
+│    │    └─ReLU: 3-72                   [1, 256, 16, 16]          --
+├─Sequential: 1-4                        [1, 512, 16, 16]          --
+│    └─BottleneckBlock: 2-12             [1, 512, 16, 16]          --
+│    │    └─Conv2d: 3-73                 [1, 256, 16, 16]          65,792
+│    │    └─BatchNorm2d: 3-74            [1, 256, 16, 16]          512
+│    │    └─ReLU: 3-75                   [1, 256, 16, 16]          --
+│    │    └─Conv2d: 3-76                 [1, 256, 16, 16]          590,080
+│    │    └─BatchNorm2d: 3-77            [1, 256, 16, 16]          512
+│    │    └─ReLU: 3-78                   [1, 256, 16, 16]          --
+│    │    └─Sequential: 3-79             [1, 256, 16, 16]          1,181,184
+│    │    └─Conv2d: 3-80                 [1, 512, 16, 16]          131,584
+│    │    └─BatchNorm2d: 3-81            [1, 512, 16, 16]          1,024
+│    │    └─Sequential: 3-82             [1, 512, 16, 16]          132,608
+│    │    └─ReLU: 3-83                   [1, 512, 16, 16]          --
+│    └─BottleneckBlock: 2-13             [1, 512, 16, 16]          --
+│    │    └─Conv2d: 3-84                 [1, 256, 16, 16]          131,328
+│    │    └─BatchNorm2d: 3-85            [1, 256, 16, 16]          512
+│    │    └─ReLU: 3-86                   [1, 256, 16, 16]          --
+│    │    └─Conv2d: 3-87                 [1, 256, 16, 16]          590,080
+│    │    └─BatchNorm2d: 3-88            [1, 256, 16, 16]          512
+│    │    └─ReLU: 3-89                   [1, 256, 16, 16]          --
+│    │    └─Sequential: 3-90             [1, 256, 16, 16]          1,181,184
+│    │    └─Conv2d: 3-91                 [1, 512, 16, 16]          131,584
+│    │    └─BatchNorm2d: 3-92            [1, 512, 16, 16]          1,024
+│    │    └─ReLU: 3-93                   [1, 512, 16, 16]          --
+│    └─BottleneckBlock: 2-14             [1, 512, 16, 16]          --
+│    │    └─Conv2d: 3-94                 [1, 256, 16, 16]          131,328
+│    │    └─BatchNorm2d: 3-95            [1, 256, 16, 16]          512
+│    │    └─ReLU: 3-96                   [1, 256, 16, 16]          --
+│    │    └─Conv2d: 3-97                 [1, 256, 16, 16]          590,080
+│    │    └─BatchNorm2d: 3-98            [1, 256, 16, 16]          512
+│    │    └─ReLU: 3-99                   [1, 256, 16, 16]          --
+│    │    └─Sequential: 3-100            [1, 256, 16, 16]          1,181,184
+│    │    └─Conv2d: 3-101                [1, 512, 16, 16]          131,584
+│    │    └─BatchNorm2d: 3-102           [1, 512, 16, 16]          1,024
+│    │    └─ReLU: 3-103                  [1, 512, 16, 16]          --
+│    └─BottleneckBlock: 2-15             [1, 512, 16, 16]          --
+│    │    └─Conv2d: 3-104                [1, 256, 16, 16]          131,328
+│    │    └─BatchNorm2d: 3-105           [1, 256, 16, 16]          512
+│    │    └─ReLU: 3-106                  [1, 256, 16, 16]          --
+│    │    └─Conv2d: 3-107                [1, 256, 16, 16]          590,080
+│    │    └─BatchNorm2d: 3-108           [1, 256, 16, 16]          512
+│    │    └─ReLU: 3-109                  [1, 256, 16, 16]          --
+│    │    └─Sequential: 3-110            [1, 256, 16, 16]          1,181,184
+│    │    └─Conv2d: 3-111                [1, 512, 16, 16]          131,584
+│    │    └─BatchNorm2d: 3-112           [1, 512, 16, 16]          1,024
+│    │    └─ReLU: 3-113                  [1, 512, 16, 16]          --
+│    └─BottleneckBlock: 2-16             [1, 512, 16, 16]          --
+│    │    └─Conv2d: 3-114                [1, 256, 16, 16]          131,328
+│    │    └─BatchNorm2d: 3-115           [1, 256, 16, 16]          512
+│    │    └─ReLU: 3-116                  [1, 256, 16, 16]          --
+│    │    └─Conv2d: 3-117                [1, 256, 16, 16]          590,080
+│    │    └─BatchNorm2d: 3-118           [1, 256, 16, 16]          512
+│    │    └─ReLU: 3-119                  [1, 256, 16, 16]          --
+│    │    └─Sequential: 3-120            [1, 256, 16, 16]          1,181,184
+│    │    └─Conv2d: 3-121                [1, 512, 16, 16]          131,584
+│    │    └─BatchNorm2d: 3-122           [1, 512, 16, 16]          1,024
+│    │    └─ReLU: 3-123                  [1, 512, 16, 16]          --
+│    └─BottleneckBlock: 2-17             [1, 512, 16, 16]          --
+│    │    └─Conv2d: 3-124                [1, 256, 16, 16]          131,328
+│    │    └─BatchNorm2d: 3-125           [1, 256, 16, 16]          512
+│    │    └─ReLU: 3-126                  [1, 256, 16, 16]          --
+│    │    └─Conv2d: 3-127                [1, 256, 16, 16]          590,080
+│    │    └─BatchNorm2d: 3-128           [1, 256, 16, 16]          512
+│    │    └─ReLU: 3-129                  [1, 256, 16, 16]          --
+│    │    └─Sequential: 3-130            [1, 256, 16, 16]          1,181,184
+│    │    └─Conv2d: 3-131                [1, 512, 16, 16]          131,584
+│    │    └─BatchNorm2d: 3-132           [1, 512, 16, 16]          1,024
+│    │    └─ReLU: 3-133                  [1, 512, 16, 16]          --
+├─MultiheadBlock: 1-5                    [1, 2048, 16, 16]         --
+│    └─Conv2d: 2-18                      [1, 512, 16, 16]          262,656
+│    └─BatchNorm2d: 2-19                 [1, 512, 16, 16]          1,024
+│    └─Conv2d: 2-20                      [1, 512, 16, 16]          2,359,808
+│    └─BatchNorm2d: 2-21                 [1, 512, 16, 16]          1,024
+│    └─Conv2d: 2-22                      [1, 512, 16, 16]          2,359,808
+│    └─BatchNorm2d: 2-23                 [1, 512, 16, 16]          1,024
+│    └─Conv2d: 2-24                      [1, 512, 16, 16]          2,359,808
+│    └─BatchNorm2d: 2-25                 [1, 512, 16, 16]          1,024
+│    └─ReLU: 2-26                        [1, 2048, 16, 16]         --
+├─Conv2d: 1-6                            [1, 512, 16, 16]          1,049,088
+├─BatchNorm2d: 1-7                       [1, 512, 16, 16]          1,024
+├─ReLU: 1-8                              [1, 512, 16, 16]          --
+├─AdaptiveAvgPool2d: 1-9                 [1, 512, 1, 1]            --
+├─Flatten: 1-10                          [1, 512]                  --
+├─Linear: 1-11                           [1, 200]                  102,600
+==========================================================================================
+Total params: 21,161,864
+Trainable params: 21,161,864
+Non-trainable params: 0
+Total mult-adds (Units.GIGABYTES): 5.47
+==========================================================================================
+Input size (MB): 0.20
+Forward/backward pass size (MB): 74.19
+Params size (MB): 84.65
+Estimated Total Size (MB): 159.03
+==========================================================================================
+
+Epoch 1, Train loss 4.34, Train accuracy 9.23, Validation loss 3.74, Validation accuracy 16.77
+Epoch 2, Train loss 3.39, Train accuracy 22.66, Validation loss 3.10, Validation accuracy 27.82
+Epoch 3, Train loss 2.93, Train accuracy 31.42, Validation loss 2.84, Validation accuracy 33.57
+Epoch 4, Train loss 2.59, Train accuracy 38.05, Validation loss 2.49, Validation accuracy 39.59
+Epoch 5, Train loss 2.32, Train accuracy 43.33, Validation loss 2.42, Validation accuracy 41.72
+Epoch 6, Train loss 2.11, Train accuracy 48.00, Validation loss 2.19, Validation accuracy 46.73
+Epoch 7, Train loss 1.91, Train accuracy 52.21, Validation loss 2.08, Validation accuracy 49.12
+Epoch 8, Train loss 1.73, Train accuracy 56.02, Validation loss 2.06, Validation accuracy 50.24
+Epoch 9, Train loss 1.57, Train accuracy 59.60, Validation loss 1.98, Validation accuracy 51.62
+Epoch 10, Train loss 1.41, Train accuracy 63.10, Validation loss 1.93, Validation accuracy 53.34
+Epoch 11, Train loss 1.25, Train accuracy 66.74, Validation loss 1.99, Validation accuracy 52.69
+Epoch 12, Train loss 1.09, Train accuracy 70.44, Validation loss 1.91, Validation accuracy 55.19
+Epoch 13, Train loss 0.95, Train accuracy 73.83, Validation loss 2.02, Validation accuracy 53.77
+Epoch 14, Train loss 0.81, Train accuracy 77.15, Validation loss 2.00, Validation accuracy 54.37
+Epoch 15, Train loss 0.69, Train accuracy 80.25, Validation loss 2.09, Validation accuracy 53.93
+Epoch 16, Train loss 0.58, Train accuracy 83.47, Validation loss 2.14, Validation accuracy 54.00
+Epoch 17, Train loss 0.49, Train accuracy 85.89, Validation loss 2.22, Validation accuracy 53.36
+Epoch 18, Train loss 0.41, Train accuracy 87.85, Validation loss 2.32, Validation accuracy 53.61
+Epoch 19, Train loss 0.36, Train accuracy 89.41, Validation loss 2.35, Validation accuracy 53.74
+Epoch 20, Train loss 0.32, Train accuracy 90.43, Validation loss 2.31, Validation accuracy 55.00
+Epoch 21, Train loss 0.29, Train accuracy 91.50, Validation loss 2.41, Validation accuracy 53.86
+Epoch 22, Train loss 0.27, Train accuracy 91.96, Validation loss 2.43, Validation accuracy 54.01
+Epoch 23, Train loss 0.25, Train accuracy 92.59, Validation loss 2.51, Validation accuracy 53.53
+Best Validation Accuracy 55.19, Epoch: 12, Training Time: 5651.66s

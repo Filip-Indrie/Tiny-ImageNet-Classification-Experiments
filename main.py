@@ -7,19 +7,19 @@ torch.manual_seed(50)
 if __name__ == "__main__":
 
     nets = [
-        # AlexNet(),
-        # VGG11(),
-        # ResNet18(),
-        # ResNet34(),
-        # ResNet50(),
-        # Scope2(),
-        # Scope3(),
-        # Scope2Atrous(),
-        # Scope3Atrous(),
-        # ShallowBottleNet(),
-        # BottleNet(),
-        # DeepBottleNet(),
-        # DeeperBottleNet()
+        AlexNet(),
+        VGG11(),
+        ResNet18(),
+        ResNet34(),
+        ResNet50(),
+        Scope2(),
+        Scope3(),
+        Scope2Atrous(),
+        Scope3Atrous(),
+        ShallowBottleNet(),
+        BottleNet(),
+        DeepBottleNet(),
+        DeeperBottleNet(),
         DilatedHeadNet(),
         MultiHeadNet()
     ]
@@ -47,5 +47,4 @@ if __name__ == "__main__":
     for net in nets:
         opt = get_optimizer(net, optimizer)
         print(type(net).__name__)
-        print(net)
         # train(net, train_iter, val_iter, num_epochs, patience, loss, opt, weight_init, device)

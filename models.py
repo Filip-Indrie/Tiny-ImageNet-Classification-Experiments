@@ -5,7 +5,7 @@ from abc import ABC
 
 __all__ = ["AlexNet", "VGG11", "ResNet18", "ResNet34", "ResNet50", "Scope2", "Scope3",
            "Scope2Atrous", "Scope3Atrous", "ShallowBottleNet", "BottleNet", "DeepBottleNet", "DeeperBottleNet",
-           "DilatedHeadNet", "MultiHeadNet"]
+           "DilatedHeadNet", "MultiHeadNet", "ShallowMultiHeadNet"]
 
 class CustomModel(nn.Module, ABC):
     """
@@ -630,6 +630,31 @@ class MultiHeadNet(CustomModel):
             nn.Linear(512, 200)
         )
 
+class ShallowMultiHeadNet(CustomModel):
+    def __init__(self):
+        super(ShallowMultiHeadNet, self).__init__()
+
+        stem = nn.Sequential(
+            nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+        )
+
+        b1 = bottleneck_stage(64, 128, 4, 3, 1, maintain_resolution=True)
+        b2 = bottleneck_stage(128, 256, 4, 4, 1)
+        multihead = MultiheadBlock(256, 512)
+
+        self._net = nn.Sequential(
+            stem, b1, b2, multihead,
+            nn.Conv2d(2048, 512, kernel_size=1, stride=1, padding=0, dilation=1),
+            nn.BatchNorm2d(512),
+            nn.ReLU(),
+            nn.AdaptiveAvgPool2d((1, 1)),
+            nn.Flatten(),
+            nn.Linear(512, 200)
+        )
+
 if __name__ == "__main__":
-    net = MultiHeadNet()
+    net = ShallowMultiHeadNet()
     print(net)

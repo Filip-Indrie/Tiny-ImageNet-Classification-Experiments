@@ -7,21 +7,22 @@ torch.manual_seed(50)
 if __name__ == "__main__":
 
     nets = [
-        AlexNet(),
-        VGG11(),
-        ResNet18(),
-        ResNet34(),
-        ResNet50(),
-        Scope2(),
-        Scope3(),
-        Scope2Atrous(),
-        Scope3Atrous(),
-        ShallowBottleNet(),
-        BottleNet(),
-        DeepBottleNet(),
-        DeeperBottleNet(),
-        DilatedHeadNet(),
-        MultiHeadNet()
+        # AlexNet(),
+        # VGG11(),
+        # ResNet18(),
+        # ResNet34(),
+        # ResNet50(),
+        # Scope2(),
+        # Scope3(),
+        # Scope2Atrous(),
+        # Scope3Atrous(),
+        # ShallowBottleNet(),
+        # BottleNet(),
+        # DeepBottleNet(),
+        # DeeperBottleNet(),
+        # DilatedHeadNet(),
+        # MultiHeadNet(),
+        ShallowMultiHeadNet()
     ]
 
     batch_size = 64

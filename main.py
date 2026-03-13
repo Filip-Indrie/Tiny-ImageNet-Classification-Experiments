@@ -22,7 +22,8 @@ if __name__ == "__main__":
         # DeeperBottleNet(),
         # DilatedHeadNet(),
         # MultiHeadNet(),
-        ShallowMultiHeadNet()
+        #ShallowMultiHeadNet(),
+        GenericTransformer()
     ]
 
     batch_size = 64
@@ -46,6 +47,13 @@ if __name__ == "__main__":
     weight_init = "kaiming_uniform"
 
     for net in nets:
-        opt = get_optimizer(net, optimizer)
+        if "Transformer" in type(net).__name__:
+            lr = 1e-2
+        else:
+            lr = 1e-3
+
+        opt = get_optimizer(net, optimizer, adam_lr=lr)
         print(type(net).__name__)
         # train(net, train_iter, val_iter, num_epochs, patience, loss, opt, weight_init, device)
+        train(net, train_iter, val_iter, 1, patience, loss, opt, weight_init, device)
+

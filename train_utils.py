@@ -38,11 +38,11 @@ def load_data_tiny_imagenet(batch_size=128):
 
     return train_loader, val_loader
 
-def get_optimizer(net, opt_type, sgd_lr=0.1, adam_lr=1e-3, adam_weight_decay=1e-2):
-    if opt_type == "sgd": return torch.optim.SGD(net.parameters(), lr=sgd_lr, momentum=0.9, nesterov=False)
-    elif opt_type == "sgd_nesterov": return torch.optim.SGD(net.parameters(), lr=sgd_lr, momentum=0.9, nesterov=True)
-    elif opt_type == "adam": return torch.optim.Adam(net.parameters(), lr=adam_lr, weight_decay=adam_weight_decay)
-    elif opt_type == "adamw": return torch.optim.AdamW(net.parameters(), lr=adam_lr, weight_decay=adam_weight_decay)
+def get_optimizer(net, opt_type, lr=1e-3, weight_decay=1e-2):
+    if opt_type == "sgd": return torch.optim.SGD(net.parameters(), lr=lr, momentum=0.9, nesterov=False)
+    elif opt_type == "sgd_nesterov": return torch.optim.SGD(net.parameters(), lr=lr, momentum=0.9, nesterov=True)
+    elif opt_type == "adam": return torch.optim.Adam(net.parameters(), lr=lr, weight_decay=weight_decay)
+    elif opt_type == "adamw": return torch.optim.AdamW(net.parameters(), lr=lr, weight_decay=weight_decay)
     else: return None
 
 def init_weights_xavier_uniform(m):

@@ -6,24 +6,35 @@ torch.manual_seed(50)
 
 if __name__ == "__main__":
 
+    """
+        Nets is defined as a tuple of a network and its associated learning rate.
+        If the learning rate is None, the default value (1e-3) is used.
+    """
     nets = [
-        # AlexNet(),
-        # VGG11(),
-        # ResNet18(),
-        # ResNet34(),
-        # ResNet50(),
-        # Scope2(),
-        # Scope3(),
-        # Scope2Atrous(),
-        # Scope3Atrous(),
-        # ShallowBottleNet(),
-        # BottleNet(),
-        # DeepBottleNet(),
-        # DeeperBottleNet(),
-        # DilatedHeadNet(),
-        # MultiHeadNet(),
-        #ShallowMultiHeadNet(),
-        GenericTransformer()
+        # (AlexNet(), None),
+        # (VGG11(), None),
+        # (ResNet18(), None),
+        # (ResNet34(), None),
+        # (ResNet50(), None),
+        # (Scope2(), None),
+        # (Scope3(), None),
+        # (Scope2Atrous(), None),
+        # (Scope3Atrous(), None),
+        # (ShallowBottleNet(), None),
+        # (BottleNet(), None),
+        # (DeepBottleNet(), None),
+        # (DeeperBottleNet(), None),
+        # (DilatedHeadNet(), None),
+        # (MultiHeadNet(), None),
+        # (ShallowMultiHeadNet(), None),
+        # (StandardTransformer(), 1e-2),
+        # (DeepTransformer(), 1e-2),
+        # (WideTransformer(), 1e-3),
+        # (DeepWideTransformer(), 1e-3),
+        (WideTransformerV2(), 1e-3),
+        (DeepWideTransformerV2(), 1e-3),
+        (WideTransformerV3(), 1e-3),
+        (DeepWideTransformerV3(), 1e-3)
     ]
 
     batch_size = 64
@@ -46,14 +57,13 @@ if __name__ == "__main__":
     optimizer = "adamw"
     weight_init = "kaiming_uniform"
 
-    for net in nets:
-        if "Transformer" in type(net).__name__:
-            lr = 1e-2
+    for net, lr in nets:
+        if lr is None:
+            opt = get_optimizer(net, optimizer)
         else:
-            lr = 1e-3
+            opt = get_optimizer(net, optimizer, lr=lr)
 
-        opt = get_optimizer(net, optimizer, adam_lr=lr)
         print(type(net).__name__)
+        print(f"Learning rate: {opt.state_dict()['param_groups'][0]['lr']}")
         # train(net, train_iter, val_iter, num_epochs, patience, loss, opt, weight_init, device)
-        train(net, train_iter, val_iter, 1, patience, loss, opt, weight_init, device)
 

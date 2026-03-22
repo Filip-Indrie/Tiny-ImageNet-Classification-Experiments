@@ -1,0 +1,59 @@
+====================================================================================================
+Layer (type:depth-idx)                             Output Shape              Param #
+====================================================================================================
+ClassificationTransformer                          [1, 200]                  --
+├─Embeddings: 1-1                                  [1, 257, 256]             66,048
+│    └─PatchEmbeddings: 2-1                        [1, 256, 256]             --
+│    │    └─Conv2d: 3-1                            [1, 256, 16, 16]          49,408
+├─Encoder: 1-2                                     [1, 257, 256]             --
+│    └─ModuleList: 2-2                             --                        --
+│    │    └─Block: 3-2                             [1, 257, 256]             789,760
+│    │    └─Block: 3-3                             [1, 257, 256]             789,760
+│    │    └─Block: 3-4                             [1, 257, 256]             789,760
+│    │    └─Block: 3-5                             [1, 257, 256]             789,760
+├─Linear: 1-3                                      [1, 200]                  51,400
+====================================================================================================
+Total params: 3,325,896
+Trainable params: 3,325,896
+Non-trainable params: 0
+Total mult-adds (Units.MEGABYTES): 15.86
+====================================================================================================
+Input size (MB): 0.20
+Forward/backward pass size (MB): 23.68
+Params size (MB): 13.04
+Estimated Total Size (MB): 36.92
+====================================================================================================
+
+Epoch 1, Train loss 5.86, Train accuracy 4.07, Validation loss 4.77, Validation accuracy 6.58
+Epoch 2, Train loss 4.40, Train accuracy 10.31, Validation loss 4.10, Validation accuracy 13.10
+Epoch 3, Train loss 3.93, Train accuracy 15.53, Validation loss 3.78, Validation accuracy 17.29
+Epoch 4, Train loss 3.63, Train accuracy 19.69, Validation loss 3.61, Validation accuracy 20.36
+Epoch 5, Train loss 3.41, Train accuracy 23.25, Validation loss 3.32, Validation accuracy 24.78
+Epoch 6, Train loss 3.23, Train accuracy 26.17, Validation loss 3.16, Validation accuracy 27.47
+Epoch 7, Train loss 3.08, Train accuracy 28.71, Validation loss 3.14, Validation accuracy 28.85
+Epoch 8, Train loss 2.94, Train accuracy 31.44, Validation loss 3.07, Validation accuracy 29.31
+Epoch 9, Train loss 2.80, Train accuracy 33.71, Validation loss 2.98, Validation accuracy 31.41
+Epoch 10, Train loss 2.68, Train accuracy 36.08, Validation loss 2.90, Validation accuracy 33.30
+Epoch 11, Train loss 2.57, Train accuracy 38.25, Validation loss 2.93, Validation accuracy 33.40
+Epoch 12, Train loss 2.46, Train accuracy 40.01, Validation loss 2.85, Validation accuracy 35.14
+Epoch 13, Train loss 2.35, Train accuracy 42.56, Validation loss 2.86, Validation accuracy 35.31
+Epoch 14, Train loss 2.25, Train accuracy 44.31, Validation loss 2.83, Validation accuracy 36.01
+Epoch 15, Train loss 2.15, Train accuracy 46.15, Validation loss 2.79, Validation accuracy 36.72
+Epoch 16, Train loss 2.06, Train accuracy 48.11, Validation loss 2.80, Validation accuracy 37.71
+Epoch 17, Train loss 1.96, Train accuracy 50.15, Validation loss 2.77, Validation accuracy 38.21
+Epoch 18, Train loss 1.87, Train accuracy 51.92, Validation loss 2.86, Validation accuracy 37.54
+Epoch 19, Train loss 1.79, Train accuracy 53.59, Validation loss 2.90, Validation accuracy 37.41
+Epoch 20, Train loss 1.71, Train accuracy 55.30, Validation loss 2.86, Validation accuracy 38.01
+Epoch 21, Train loss 1.62, Train accuracy 57.14, Validation loss 2.88, Validation accuracy 39.20
+Epoch 22, Train loss 1.55, Train accuracy 58.70, Validation loss 2.97, Validation accuracy 38.25
+Epoch 23, Train loss 1.47, Train accuracy 60.51, Validation loss 3.09, Validation accuracy 36.93
+Epoch 24, Train loss 1.40, Train accuracy 61.94, Validation loss 3.09, Validation accuracy 37.94
+Epoch 25, Train loss 1.34, Train accuracy 63.44, Validation loss 3.19, Validation accuracy 37.38
+Epoch 26, Train loss 1.27, Train accuracy 64.86, Validation loss 3.17, Validation accuracy 38.64
+Epoch 27, Train loss 1.22, Train accuracy 66.07, Validation loss 3.25, Validation accuracy 37.85
+Epoch 28, Train loss 1.15, Train accuracy 67.80, Validation loss 3.32, Validation accuracy 37.88
+Epoch 29, Train loss 1.11, Train accuracy 68.72, Validation loss 3.29, Validation accuracy 38.36
+Epoch 30, Train loss 1.06, Train accuracy 69.68, Validation loss 3.43, Validation accuracy 37.67
+Epoch 31, Train loss 1.02, Train accuracy 70.93, Validation loss 3.49, Validation accuracy 37.21
+Epoch 32, Train loss 0.97, Train accuracy 72.20, Validation loss 3.56, Validation accuracy 36.64
+Best Validation Accuracy 39.20, Epoch: 21, Training Time: 5334.47s

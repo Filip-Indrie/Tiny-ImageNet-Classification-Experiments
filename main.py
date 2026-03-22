@@ -31,9 +31,9 @@ if __name__ == "__main__":
         # (DeepTransformer(), 1e-2),
         # (WideTransformer(), 1e-3),
         # (DeepWideTransformer(), 1e-3),
-        (WideTransformerV2(), 1e-3),
-        (DeepWideTransformerV2(), 1e-3),
-        (WideTransformerV3(), 1e-3),
+        # (WideTransformerV2(), 1e-3),
+        # (DeepWideTransformerV2(), 1e-3),
+        # (WideTransformerV3(), 1e-3),
         (DeepWideTransformerV3(), 1e-3)
     ]
 
@@ -64,6 +64,6 @@ if __name__ == "__main__":
             opt = get_optimizer(net, optimizer, lr=lr)
 
         print(type(net).__name__)
-        print(f"Learning rate: {opt.state_dict()['param_groups'][0]['lr']}")
-        # train(net, train_iter, val_iter, num_epochs, patience, loss, opt, weight_init, device)
+        # print(f"Learning rate: {opt.state_dict()['param_groups'][0]['lr']}")
+        train(net, train_iter, val_iter, num_epochs, patience, loss, opt, weight_init, device)
 

@@ -9,7 +9,8 @@ __all__ = ["AlexNet", "VGG11", "ResNet18", "ResNet34", "ResNet50", "Scope2", "Sc
            "DilatedHeadNet", "MultiHeadNet", "ShallowMultiHeadNet",
            "StandardTransformer", "DeepTransformer", "WideTransformer", "DeepWideTransformer",
            "WideTransformerV2", "DeepWideTransformerV2", "WideTransformerV3", "DeepWideTransformerV3",
-           "LowResTransformer", "DeepLowResTransformer", "WideLowResTransformer", "DeepWideLowResTransformer","DeeperWideLowResTransformer"]
+           "LowResTransformer", "DeepLowResTransformer", "WideLowResTransformer", "DeepWideLowResTransformer","DeeperWideLowResTransformer",
+           "WideLowResTransformerV2", "DeepWideLowResTransformerV2", "DeeperWideLowResTransformerV2"]
 
 class CustomModel(nn.Module, ABC):
     """
@@ -902,6 +903,24 @@ class DeeperWideLowResTransformer(CustomModel):
 
         self._net = ClassificationTransformer(embed_size=128, patch_dim=16, num_blocks=8, num_heads=4, mlp_hidden_size=512)
 
+class WideLowResTransformerV2(CustomModel):
+    def __init__(self):
+        super(WideLowResTransformerV2, self).__init__()
+
+        self._net = ClassificationTransformer(embed_size=256, patch_dim=16, num_blocks=4, num_heads=4, mlp_hidden_size=1024)
+
+class DeepWideLowResTransformerV2(CustomModel):
+    def __init__(self):
+        super(DeepWideLowResTransformerV2, self).__init__()
+
+        self._net = ClassificationTransformer(embed_size=256, patch_dim=16, num_blocks=6, num_heads=4, mlp_hidden_size=1024)
+
+class DeeperWideLowResTransformerV2(CustomModel):
+    def __init__(self):
+        super(DeeperWideLowResTransformerV2, self).__init__()
+
+        self._net = ClassificationTransformer(embed_size=256, patch_dim=16, num_blocks=8, num_heads=4, mlp_hidden_size=1024)
+
 if __name__ == "__main__":
-    net = DeeperWideLowResTransformer()
+    net = DeeperWideLowResTransformerV2()
     print(net)

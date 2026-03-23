@@ -34,12 +34,15 @@ if __name__ == "__main__":
         # (WideTransformerV2(), 1e-3),
         # (DeepWideTransformerV2(), 1e-3),
         # (WideTransformerV3(), 1e-3),
-        (DeepWideTransformerV3(), 1e-3),
-        (LowResTransformer(), 1e-3),
-        (DeepLowResTransformer(), 1e-3),
-        (WideLowResTransformer(), 1e-3),
-        (DeepWideLowResTransformer(), 1e-3),
-        (DeeperWideLowResTransformer(), 1e-3),
+        # (DeepWideTransformerV3(), 1e-3),
+        # (LowResTransformer(), 1e-3),
+        # (DeepLowResTransformer(), 1e-3),
+        # (WideLowResTransformer(), 1e-3),
+        # (DeepWideLowResTransformer(), 1e-3),
+        # (DeeperWideLowResTransformer(), 1e-3),
+        (WideLowResTransformerV2(), 1e-3),
+        (DeepWideLowResTransformerV2(), 1e-3),
+        (DeeperWideLowResTransformerV2(), 1e-3),
     ]
 
     batch_size = 64
@@ -69,6 +72,6 @@ if __name__ == "__main__":
             opt = get_optimizer(net, optimizer, lr=lr)
 
         print(type(net).__name__)
-        # print(f"Learning rate: {opt.state_dict()['param_groups'][0]['lr']}")
-        train(net, train_iter, val_iter, num_epochs, patience, loss, opt, weight_init, device)
+        print(f"Learning rate: {opt.state_dict()['param_groups'][0]['lr']}")
+        # train(net, train_iter, val_iter, num_epochs, patience, loss, opt, weight_init, device)
 

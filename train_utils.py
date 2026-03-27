@@ -80,7 +80,7 @@ def evaluate_accuracy(net, data_iter, loss, device):
     with torch.no_grad():
         for x, y in data_iter:
             x, y = x.to(device), y.to(device)
-            y_hat = net(x)[0]
+            y_hat = net(x, inference=True)[0]
             l = loss(y_hat, y)
 
             with torch.no_grad():
@@ -103,7 +103,7 @@ def train_epoch(net, train_iter, loss, optimizer, device):
     for x, y in train_iter:
         # Compute gradients and update parameters
         x, y = x.to(device), y.to(device)
-        y_hat = net(x)[0]
+        y_hat = net(x, inference=False)[0]
         l = loss(y_hat, y)
 
         # Using PyTorch built-in optimizer & loss criterion
@@ -135,7 +135,7 @@ def train_epoch_amp(net, train_iter, loss, optimizer, scaler, device):
         optimizer.zero_grad()
 
         with torch.amp.autocast("cuda"):
-            y_hat = net(x)[0]
+            y_hat = net(x, inference=False)[0]
             l = loss(y_hat, y)
 
         scaler.scale(l).backward()

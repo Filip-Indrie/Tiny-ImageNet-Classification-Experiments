@@ -23,12 +23,23 @@ class CustomModel(nn.Module, ABC):
         super(CustomModel, self).__init__()
         self._net = None
 
-    def forward(self, x):
+    def forward(self, x, **kwargs):
         return self._net(x)
 
     def __str__(self):
         return str(summary(self._net, input_size=(1, 3, 128, 128), verbose=0))
 
+class CustomModelV2(CustomModel):
+    """
+        Has the same objective as `CustomModel`, but allows
+        the `inference` param to be passed on to the forward method.
+    """
+
+    def __init__(self):
+        super(CustomModelV2, self).__init__()
+
+    def forward(self, x, inference=False):
+        return self._net(x, inference=inference)
 
 
 class AlexNet(CustomModel):
@@ -671,20 +682,24 @@ class PatchEmbeddings(nn.Module):
         return x
 
 class Embeddings(nn.Module):
-    def __init__(self, in_channels=3, embed_size=48, patch_dim=4):
+    def __init__(self, in_channels=3, embed_size=48, patch_dim=4, dropout=0.1):
         super().__init__()
         self.patch_embeddings = PatchEmbeddings(in_channels=in_channels, embed_dim=embed_size, patch_dim=patch_dim)
         self.cls_token = nn.Parameter(torch.randn(1, 1, embed_size)) # adds the class token to the embeddings
         num_patches = (128 // patch_dim) ** 2
         self.position_embeddings = nn.Parameter(torch.randn(1, num_patches + 1, embed_size)) # learned positional encodings
+        self.dropout = nn.Dropout(p=dropout)
 
-    def forward(self, x):
+    def forward(self, x, inference=False):
         x = self.patch_embeddings(x)
         batch_size, _, _ = x.size()
         cls_tokens = self.cls_token.expand(batch_size, -1, -1) # 1 class token for each image in a batch
         x = torch.cat((cls_tokens, x), dim=1) # concatenates the class token to the other tokens
         x = x + self.position_embeddings # adds positional encoding to the image embedding
-        return x
+        if inference:
+            return x
+        else:
+            return self.dropout(x)
 
 class AttentionHead(nn.Module):
     def __init__(self, embed_dim, attention_head_size):
@@ -733,51 +748,64 @@ def GELU(x):
     return 0.5 * x * (1.0 + torch.tanh(math.sqrt(2.0 / math.pi) * (x + 0.044715 * torch.pow(x, 3.0))))
 
 class MLP(nn.Module):
-    def __init__(self, embed_size, hidden_size):
+    def __init__(self, embed_size, hidden_size, dropout):
         super().__init__()
         self.dense_1 = nn.Linear(embed_size, hidden_size)
+        self.dropout = nn.Dropout(p=dropout)
         self.activation = GELU
         self.dense_2 = nn.Linear(hidden_size, embed_size)
 
-    def forward(self, x):
+    def forward(self, x, inference=False):
         x = self.dense_1(x)
-        x = self.activation(x)
-        x = self.dense_2(x)
-        return x
+        if inference:
+            x = self.activation(x)
+            x = self.dense_2(x)
+            return x
+        else:
+            x = self.activation(self.dropout(x))
+            x = self.dropout(self.dense_2(x))
+            return x
 
 class Block(nn.Module):
-    def __init__(self, embed_size, num_heads, mlp_hidden_size):
+    def __init__(self, embed_size, num_heads, mlp_hidden_size, dropout):
         super().__init__()
         self.attention = MultiHeadAttention(embed_size, num_heads)
         self.layernorm_1 = nn.LayerNorm(embed_size)
-        self.mlp = MLP(embed_size, mlp_hidden_size)
+        self.mlp = MLP(embed_size, mlp_hidden_size, dropout)
         self.layernorm_2 = nn.LayerNorm(embed_size)
+        self.dropout = nn.Dropout(p=dropout)
 
-    def forward(self, x, output_attentions=False):
+    def forward(self, x, output_attentions=False, inference=False):
         attention_output, attention_probs = self.attention(self.layernorm_1(x), output_attentions=output_attentions)
-        x = x + attention_output # residual
-        mlp_output = self.mlp(self.layernorm_2(x))
-        x = x + mlp_output # residual
+        if inference:
+            x = x + attention_output # residual
+        else:
+            x = x + self.dropout(attention_output) # residual
+        mlp_output = self.mlp(self.layernorm_2(x), inference=inference)
+        x = x + mlp_output # residual; output layer is performed by the MLP block
         if not output_attentions:
             return x, None
         else:
             return x, attention_probs
 
 class Encoder(nn.Module):
-    def __init__(self, num_blocks, embed_size, num_heads, mlp_hidden_size):
+    def __init__(self, num_blocks, embed_size, num_heads, mlp_hidden_size, dropout):
         super().__init__()
+        self.layernorm = nn.LayerNorm(embed_size)
         self.blocks = nn.ModuleList([])
         for _ in range(num_blocks):
-            block = Block(embed_size, num_heads, mlp_hidden_size)
+            block = Block(embed_size, num_heads, mlp_hidden_size, dropout=dropout)
             self.blocks.append(block)
 
-    def forward(self, x, output_attentions=False):
+    def forward(self, x, output_attentions=False, inference=False):
         all_attentions = []
         for block in self.blocks:
             x, attention_probs = block(x,
-               output_attentions=output_attentions)
+               output_attentions=output_attentions, inference=inference)
             if output_attentions:
                 all_attentions.append(attention_probs)
+
+        x = self.layernorm(x)
         if not output_attentions:
             return x, None
         else:
@@ -802,18 +830,18 @@ def _init_transformer_weights(module):
 
 
 class ClassificationTransformer(nn.Module):
-    def __init__(self, embed_size, patch_dim, num_blocks, num_heads, mlp_hidden_size):
+    def __init__(self, embed_size, patch_dim, num_blocks, num_heads, mlp_hidden_size, dropout=0.1):
         super().__init__()
         self.image_size = 128
         self.num_classes = 200
-        self.embedding = Embeddings(in_channels=3, embed_size=embed_size, patch_dim=patch_dim)
-        self.encoder = Encoder(num_blocks, embed_size, num_heads, mlp_hidden_size)
+        self.embedding = Embeddings(in_channels=3, embed_size=embed_size, patch_dim=patch_dim, dropout=dropout)
+        self.encoder = Encoder(num_blocks, embed_size, num_heads, mlp_hidden_size, dropout=dropout)
         self.classifier = nn.Linear(embed_size, self.num_classes)
         self.apply(_init_transformer_weights)
 
-    def forward(self, x, output_attentions=False):
-        embedding_output = self.embedding(x)
-        encoder_output, all_attentions = self.encoder(embedding_output, output_attentions=output_attentions)
+    def forward(self, x, output_attentions=False, inference=False):
+        embedding_output = self.embedding(x, inference=inference)
+        encoder_output, all_attentions = self.encoder(embedding_output, output_attentions=output_attentions, inference=inference)
         logits = self.classifier(encoder_output[:, 0, :]) # only taking into account the class token
         if not output_attentions:
             return logits, None
@@ -821,101 +849,97 @@ class ClassificationTransformer(nn.Module):
             return logits, all_attentions
 
 
-class StandardTransformer(CustomModel):
+class StandardTransformer(CustomModelV2):
     def __init__(self):
         super(StandardTransformer, self).__init__()
 
         self._net = ClassificationTransformer(embed_size=48, patch_dim=8, num_blocks=4, num_heads=4, mlp_hidden_size=256)
 
-class DeepTransformer(CustomModel):
+class DeepTransformer(CustomModelV2):
     def __init__(self):
         super(DeepTransformer, self).__init__()
 
         self._net = ClassificationTransformer(embed_size=48, patch_dim=8, num_blocks=6, num_heads=4, mlp_hidden_size=256)
 
-class WideTransformer(CustomModel):
+class WideTransformer(CustomModelV2):
     def __init__(self):
         super(WideTransformer, self).__init__()
 
         self._net = ClassificationTransformer(embed_size=96, patch_dim=8, num_blocks=4, num_heads=4, mlp_hidden_size=512)
 
-class DeepWideTransformer(CustomModel):
+class DeepWideTransformer(CustomModelV2):
     def __init__(self):
         super(DeepWideTransformer, self).__init__()
 
         self._net = ClassificationTransformer(embed_size=96, patch_dim=8, num_blocks=6, num_heads=4, mlp_hidden_size=512)
 
-class WideTransformerV2(CustomModel):
+class WideTransformerV2(CustomModelV2):
     def __init__(self):
         super(WideTransformerV2, self).__init__()
 
         self._net = ClassificationTransformer(embed_size=128, patch_dim=8, num_blocks=4, num_heads=4, mlp_hidden_size=512)
 
-class DeepWideTransformerV2(CustomModel):
+class DeepWideTransformerV2(CustomModelV2):
     def __init__(self):
         super(DeepWideTransformerV2, self).__init__()
 
         self._net = ClassificationTransformer(embed_size=128, patch_dim=8, num_blocks=6, num_heads=4, mlp_hidden_size=512)
 
-
-class WideTransformerV3(CustomModel):
+class WideTransformerV3(CustomModelV2):
     def __init__(self):
         super(WideTransformerV3, self).__init__()
 
         self._net = ClassificationTransformer(embed_size=256, patch_dim=8, num_blocks=4, num_heads=4, mlp_hidden_size=1024)
 
-
-class DeepWideTransformerV3(CustomModel):
+class DeepWideTransformerV3(CustomModelV2):
     def __init__(self):
         super(DeepWideTransformerV3, self).__init__()
 
         self._net = ClassificationTransformer(embed_size=256, patch_dim=8, num_blocks=6, num_heads=4, mlp_hidden_size=1024)
 
-
-class LowResTransformer(CustomModel):
+class LowResTransformer(CustomModelV2):
     def __init__(self):
         super(LowResTransformer, self).__init__()
 
         self._net = ClassificationTransformer(embed_size=64, patch_dim=16, num_blocks=4, num_heads=4, mlp_hidden_size=256)
 
-
-class DeepLowResTransformer(CustomModel):
+class DeepLowResTransformer(CustomModelV2):
     def __init__(self):
         super(DeepLowResTransformer, self).__init__()
 
         self._net = ClassificationTransformer(embed_size=64, patch_dim=16, num_blocks=6, num_heads=4, mlp_hidden_size=256)
 
-class WideLowResTransformer(CustomModel):
+class WideLowResTransformer(CustomModelV2):
     def __init__(self):
         super(WideLowResTransformer, self).__init__()
 
         self._net = ClassificationTransformer(embed_size=128, patch_dim=16, num_blocks=4, num_heads=4, mlp_hidden_size=512)
 
-class DeepWideLowResTransformer(CustomModel):
+class DeepWideLowResTransformer(CustomModelV2):
     def __init__(self):
         super(DeepWideLowResTransformer, self).__init__()
 
         self._net = ClassificationTransformer(embed_size=128, patch_dim=16, num_blocks=6, num_heads=4, mlp_hidden_size=512)
 
-class DeeperWideLowResTransformer(CustomModel):
+class DeeperWideLowResTransformer(CustomModelV2):
     def __init__(self):
         super(DeeperWideLowResTransformer, self).__init__()
 
         self._net = ClassificationTransformer(embed_size=128, patch_dim=16, num_blocks=8, num_heads=4, mlp_hidden_size=512)
 
-class WideLowResTransformerV2(CustomModel):
+class WideLowResTransformerV2(CustomModelV2):
     def __init__(self):
         super(WideLowResTransformerV2, self).__init__()
 
         self._net = ClassificationTransformer(embed_size=256, patch_dim=16, num_blocks=4, num_heads=4, mlp_hidden_size=1024)
 
-class DeepWideLowResTransformerV2(CustomModel):
+class DeepWideLowResTransformerV2(CustomModelV2):
     def __init__(self):
         super(DeepWideLowResTransformerV2, self).__init__()
 
         self._net = ClassificationTransformer(embed_size=256, patch_dim=16, num_blocks=6, num_heads=4, mlp_hidden_size=1024)
 
-class DeeperWideLowResTransformerV2(CustomModel):
+class DeeperWideLowResTransformerV2(CustomModelV2):
     def __init__(self):
         super(DeeperWideLowResTransformerV2, self).__init__()
 

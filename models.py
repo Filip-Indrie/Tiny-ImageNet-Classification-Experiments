@@ -10,7 +10,8 @@ __all__ = ["AlexNet", "VGG11", "ResNet18", "ResNet34", "ResNet50", "Scope2", "Sc
            "StandardTransformer", "DeepTransformer", "WideTransformer", "DeepWideTransformer",
            "WideTransformerV2", "DeepWideTransformerV2", "WideTransformerV3", "DeepWideTransformerV3",
            "LowResTransformer", "DeepLowResTransformer", "WideLowResTransformer", "DeepWideLowResTransformer","DeeperWideLowResTransformer",
-           "WideLowResTransformerV2", "DeepWideLowResTransformerV2", "DeeperWideLowResTransformerV2"]
+           "WideLowResTransformerV2", "DeepWideLowResTransformerV2", "DeeperWideLowResTransformerV2",
+           "CNNViT", "CNNViTNoBottleneck", "LowResCNNViT", "LowResCNNViTNoBottleneck",]
 
 class CustomModel(nn.Module, ABC):
     """
@@ -32,7 +33,7 @@ class CustomModel(nn.Module, ABC):
 class CustomModelV2(CustomModel):
     """
         Has the same objective as `CustomModel`, but allows
-        the `inference` param to be passed on to the forward method.
+        the `inference` parameter to be passed on to the forward method.
     """
 
     def __init__(self):
@@ -40,7 +41,6 @@ class CustomModelV2(CustomModel):
 
     def forward(self, x, inference=False):
         return self._net(x, inference=inference)
-
 
 class AlexNet(CustomModel):
     def __init__(self):
@@ -682,11 +682,11 @@ class PatchEmbeddings(nn.Module):
         return x
 
 class Embeddings(nn.Module):
-    def __init__(self, in_channels=3, embed_size=48, patch_dim=4, dropout=0.1):
+    def __init__(self, in_channels=3, image_shape=128, embed_size=48, patch_dim=4, dropout=0.1):
         super().__init__()
         self.patch_embeddings = PatchEmbeddings(in_channels=in_channels, embed_dim=embed_size, patch_dim=patch_dim)
         self.cls_token = nn.Parameter(torch.randn(1, 1, embed_size)) # adds the class token to the embeddings
-        num_patches = (128 // patch_dim) ** 2
+        num_patches = (image_shape // patch_dim) ** 2
         self.position_embeddings = nn.Parameter(torch.randn(1, num_patches + 1, embed_size)) # learned positional encodings
         self.dropout = nn.Dropout(p=dropout)
 
@@ -830,11 +830,10 @@ def _init_transformer_weights(module):
 
 
 class ClassificationTransformer(nn.Module):
-    def __init__(self, embed_size, patch_dim, num_blocks, num_heads, mlp_hidden_size, dropout=0.1):
+    def __init__(self, embed_size, patch_dim, num_blocks, num_heads, mlp_hidden_size, dropout=0.1, in_channels=3, image_shape=128):
         super().__init__()
-        self.image_size = 128
         self.num_classes = 200
-        self.embedding = Embeddings(in_channels=3, embed_size=embed_size, patch_dim=patch_dim, dropout=dropout)
+        self.embedding = Embeddings(in_channels=in_channels, image_shape=image_shape, embed_size=embed_size, patch_dim=patch_dim, dropout=dropout)
         self.encoder = Encoder(num_blocks, embed_size, num_heads, mlp_hidden_size, dropout=dropout)
         self.classifier = nn.Linear(embed_size, self.num_classes)
         self.apply(_init_transformer_weights)
@@ -945,6 +944,90 @@ class DeeperWideLowResTransformerV2(CustomModelV2):
 
         self._net = ClassificationTransformer(embed_size=256, patch_dim=16, num_blocks=8, num_heads=4, mlp_hidden_size=1024)
 
+class CNNViT(CustomModelV2):
+    def __init__(self):
+        super(CNNViT, self).__init__()
+
+        stem = nn.Sequential(
+            nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+        )
+
+        b1 = bottleneck_stage(64, 128, 4, 3, 1, maintain_resolution=True)
+
+        transformer = ClassificationTransformer(embed_size=512, patch_dim=2, num_blocks=4, num_heads=4, mlp_hidden_size=2048, in_channels=128, image_shape=32)
+
+        self._net = nn.Sequential(
+            stem,
+            b1,
+            transformer
+        )
+
+class CNNViTNoBottleneck(CustomModelV2):
+    def __init__(self):
+        super(CNNViTNoBottleneck, self).__init__()
+
+        stem = nn.Sequential(
+            nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+        )
+
+        b1 = bottleneck_stage(64, 128, 1, 3, 1, maintain_resolution=True)
+
+        transformer = ClassificationTransformer(embed_size=512, patch_dim=2, num_blocks=4, num_heads=4, mlp_hidden_size=2048, in_channels=128, image_shape=32)
+
+        self._net = nn.Sequential(
+            stem,
+            b1,
+            transformer
+        )
+
+class LowResCNNViT(CustomModelV2):
+    def __init__(self):
+        super(LowResCNNViT, self).__init__()
+
+        stem = nn.Sequential(
+            nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+        )
+
+        b1 = bottleneck_stage(64, 128, 4, 3, 1, maintain_resolution=True)
+
+        transformer = ClassificationTransformer(embed_size=512, patch_dim=4, num_blocks=4, num_heads=4, mlp_hidden_size=2048, in_channels=128, image_shape=32)
+
+        self._net = nn.Sequential(
+            stem,
+            b1,
+            transformer
+        )
+
+class LowResCNNViTNoBottleneck(CustomModelV2):
+    def __init__(self):
+        super(LowResCNNViTNoBottleneck, self).__init__()
+
+        stem = nn.Sequential(
+            nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3),
+            nn.BatchNorm2d(64),
+            nn.ReLU(),
+            nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+        )
+
+        b1 = bottleneck_stage(64, 128, 1, 3, 1, maintain_resolution=True)
+
+        transformer = ClassificationTransformer(embed_size=512, patch_dim=4, num_blocks=4, num_heads=4, mlp_hidden_size=2048, in_channels=128, image_shape=32)
+
+        self._net = nn.Sequential(
+            stem,
+            b1,
+            transformer
+        )
+
 if __name__ == "__main__":
-    net = DeeperWideLowResTransformerV2()
+    net = LowResCNNViTNoBottleneck()
     print(net)

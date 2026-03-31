@@ -40,9 +40,13 @@ if __name__ == "__main__":
         # (WideLowResTransformer(), 1e-3),
         # (DeepWideLowResTransformer(), 1e-3),
         # (DeeperWideLowResTransformer(), 1e-3),
-        (WideLowResTransformerV2(), 1e-3),
+        # (WideLowResTransformerV2(), 1e-3),
         (DeepWideLowResTransformerV2(), 1e-3),
         (DeeperWideLowResTransformerV2(), 1e-3),
+        (CNNViT(), 1e-3),
+        (CNNViTNoBottleneck(), 1e-3),
+        (LowResCNNViT(), 1e-3),
+        (LowResCNNViTNoBottleneck(), 1e-3),
     ]
 
     batch_size = 64

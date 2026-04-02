@@ -926,15 +926,15 @@ class CNNViT(CustomModel):
         super(CNNViT, self).__init__()
 
         stem = nn.Sequential(
-            nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3),
-            nn.BatchNorm2d(64),
+            nn.Conv2d(3, 32, kernel_size=7, stride=2, padding=3),
+            nn.BatchNorm2d(32),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
         )
 
-        b1 = bottleneck_stage(64, 128, 4, 3, 1, maintain_resolution=True)
+        b1 = bottleneck_stage(32, 64, 2, 3, 1, maintain_resolution=True)
 
-        transformer = ClassificationTransformer(embed_size=512, patch_dim=2, num_blocks=4, num_heads=4, mlp_hidden_size=2048, in_channels=128, image_shape=32)
+        transformer = ClassificationTransformer(embed_size=256, patch_dim=2, num_blocks=4, num_heads=4, mlp_hidden_size=1024, in_channels=64, image_shape=32)
 
         self._net = nn.Sequential(
             stem,
@@ -947,15 +947,15 @@ class CNNViTNoBottleneck(CustomModel):
         super(CNNViTNoBottleneck, self).__init__()
 
         stem = nn.Sequential(
-            nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3),
-            nn.BatchNorm2d(64),
+            nn.Conv2d(3, 32, kernel_size=7, stride=2, padding=3),
+            nn.BatchNorm2d(32),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
         )
 
-        b1 = bottleneck_stage(64, 128, 1, 3, 1, maintain_resolution=True)
+        b1 = bottleneck_stage(32, 64, 1, 3, 1, maintain_resolution=True)
 
-        transformer = ClassificationTransformer(embed_size=512, patch_dim=2, num_blocks=4, num_heads=4, mlp_hidden_size=2048, in_channels=128, image_shape=32)
+        transformer = ClassificationTransformer(embed_size=256, patch_dim=2, num_blocks=4, num_heads=4, mlp_hidden_size=1024, in_channels=64, image_shape=32)
 
         self._net = nn.Sequential(
             stem,
@@ -968,15 +968,15 @@ class LowResCNNViT(CustomModel):
         super(LowResCNNViT, self).__init__()
 
         stem = nn.Sequential(
-            nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3),
-            nn.BatchNorm2d(64),
+            nn.Conv2d(3, 32, kernel_size=7, stride=2, padding=3),
+            nn.BatchNorm2d(32),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
         )
 
-        b1 = bottleneck_stage(64, 128, 4, 3, 1, maintain_resolution=True)
+        b1 = bottleneck_stage(32, 64, 2, 3, 1, maintain_resolution=True)
 
-        transformer = ClassificationTransformer(embed_size=512, patch_dim=4, num_blocks=4, num_heads=4, mlp_hidden_size=2048, in_channels=128, image_shape=32)
+        transformer = ClassificationTransformer(embed_size=512, patch_dim=4, num_blocks=4, num_heads=4, mlp_hidden_size=2048, in_channels=64, image_shape=32)
 
         self._net = nn.Sequential(
             stem,
@@ -989,15 +989,15 @@ class LowResCNNViTNoBottleneck(CustomModel):
         super(LowResCNNViTNoBottleneck, self).__init__()
 
         stem = nn.Sequential(
-            nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3),
-            nn.BatchNorm2d(64),
+            nn.Conv2d(3, 32, kernel_size=7, stride=2, padding=3),
+            nn.BatchNorm2d(32),
             nn.ReLU(),
             nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
         )
 
-        b1 = bottleneck_stage(64, 128, 1, 3, 1, maintain_resolution=True)
+        b1 = bottleneck_stage(32, 64, 1, 3, 1, maintain_resolution=True)
 
-        transformer = ClassificationTransformer(embed_size=512, patch_dim=4, num_blocks=4, num_heads=4, mlp_hidden_size=2048, in_channels=128, image_shape=32)
+        transformer = ClassificationTransformer(embed_size=512, patch_dim=4, num_blocks=4, num_heads=4, mlp_hidden_size=2048, in_channels=64, image_shape=32)
 
         self._net = nn.Sequential(
             stem,

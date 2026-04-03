@@ -43,7 +43,7 @@ if __name__ == "__main__":
         # (WideLowResTransformerV2(), 1e-3),
         # (DeepWideLowResTransformerV2(), 1e-3),
         # (DeeperWideLowResTransformerV2(), 1e-3),
-        (CNNViT(), 1e-3),
+        # (CNNViT(), 1e-3),
         (CNNViTNoBottleneck(), 1e-3),
         (LowResCNNViT(), 1e-3),
         (LowResCNNViTNoBottleneck(), 1e-3),

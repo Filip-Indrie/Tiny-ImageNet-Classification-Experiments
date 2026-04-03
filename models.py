@@ -976,7 +976,7 @@ class LowResCNNViT(CustomModel):
 
         b1 = bottleneck_stage(32, 64, 2, 3, 1, maintain_resolution=True)
 
-        transformer = ClassificationTransformer(embed_size=512, patch_dim=4, num_blocks=4, num_heads=4, mlp_hidden_size=2048, in_channels=64, image_shape=32)
+        transformer = ClassificationTransformer(embed_size=256, patch_dim=4, num_blocks=4, num_heads=4, mlp_hidden_size=1024, in_channels=64, image_shape=32)
 
         self._net = nn.Sequential(
             stem,
@@ -997,7 +997,7 @@ class LowResCNNViTNoBottleneck(CustomModel):
 
         b1 = bottleneck_stage(32, 64, 1, 3, 1, maintain_resolution=True)
 
-        transformer = ClassificationTransformer(embed_size=512, patch_dim=4, num_blocks=4, num_heads=4, mlp_hidden_size=2048, in_channels=64, image_shape=32)
+        transformer = ClassificationTransformer(embed_size=256, patch_dim=4, num_blocks=4, num_heads=4, mlp_hidden_size=1024, in_channels=64, image_shape=32)
 
         self._net = nn.Sequential(
             stem,

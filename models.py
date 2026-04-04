@@ -11,7 +11,8 @@ __all__ = ["AlexNet", "VGG11", "ResNet18", "ResNet34", "ResNet50", "Scope2", "Sc
            "WideTransformerV2", "DeepWideTransformerV2", "WideTransformerV3", "DeepWideTransformerV3",
            "LowResTransformer", "DeepLowResTransformer", "WideLowResTransformer", "DeepWideLowResTransformer","DeeperWideLowResTransformer",
            "WideLowResTransformerV2", "DeepWideLowResTransformerV2", "DeeperWideLowResTransformerV2",
-           "CNNViT", "CNNViTNoBottleneck", "LowResCNNViT", "LowResCNNViTNoBottleneck",]
+           "CNNViT", "CNNViTNoBottleneck", "LowResCNNViT", "LowResCNNViTNoBottleneck",
+           "LowResCNNViTV2", "LowResCNNViTV3"]
 
 class CustomModel(nn.Module, ABC):
     """
@@ -429,29 +430,71 @@ class BottleneckBlock(nn.Module):
 
         self.act = nn.ReLU()
 
+class BottleneckBlockLateNorm(nn.Module):
+    def __init__(self, in_channels, out_channels, bottleneck, num_convs, stride=1, dilation=1):
+        super(BottleneckBlockLateNorm, self).__init__()
+
+        self.conv1 = nn.Conv2d(in_channels, out_channels // bottleneck, kernel_size=1, stride=1, padding=0,
+                               dilation=1)
+        self.bn1 = nn.BatchNorm2d(out_channels // bottleneck)
+
+        self.conv2 = nn.Conv2d(out_channels // bottleneck, out_channels // bottleneck, kernel_size=3, stride=stride,
+                               padding=3 // 2 * dilation, dilation=dilation)
+        self.bn2 = nn.BatchNorm2d(out_channels // bottleneck)
+
+        convs = []
+        for _ in range(num_convs - 1):
+            convs += [nn.Conv2d(out_channels // bottleneck, out_channels // bottleneck, kernel_size=3, stride=1,
+                                padding=3 // 2 * dilation, dilation=dilation),
+                      nn.ReLU(),
+                      nn.BatchNorm2d(out_channels // bottleneck)]
+        self.convs = nn.Sequential(*convs)
+
+        self.conv3 = nn.Conv2d(out_channels // bottleneck, out_channels, kernel_size=1, stride=1, padding=0,
+                               dilation=1)
+        self.bn3 = nn.BatchNorm2d(out_channels)
+
+        if stride != 1 or in_channels != out_channels:
+            self.downsample = nn.Sequential(
+                nn.Conv2d(in_channels, out_channels, kernel_size=1, stride=stride, dilation=1),
+                nn.BatchNorm2d(out_channels)
+            )
+        else:
+            self.downsample = None
+
+        self.act = nn.ReLU()
+
     def forward(self, x):
         residual = x
-        out = self.act(self.bn1(self.conv1(x)))
-        out = self.act(self.bn2(self.conv2(out)))
+
+        out = self.bn1(self.act(self.conv1(x)))
+        out = self.bn2(self.act(self.conv2(out)))
         out = self.convs(out)
-        out = self.bn3(self.conv3(out))
+        out = self.conv3(out)
 
         if self.downsample is not None:
-            residual = self.downsample(x)
-
-        return self.act(out + residual)
+            residual = self.downsample(residual)
 
 
-def bottleneck_stage(in_channels, out_channels, bottleneck, num_blocks, num_convs, dilation=1, maintain_resolution=False):
+        return self.bn3(self.act(out + residual))
+
+
+def bottleneck_stage(in_channels, out_channels, bottleneck, num_blocks, num_convs, dilation=1, maintain_resolution=False, late_norm=False):
     blk = []
+
+    if late_norm:
+        block = BottleneckBlockLateNorm
+    else:
+        block = BottleneckBlock
+
     for i in range(num_blocks):
         if i == 0:
             if maintain_resolution:
-                blk.append(BottleneckBlock(in_channels, out_channels, bottleneck, num_convs, stride=1, dilation=dilation))
+                blk.append(block(in_channels, out_channels, bottleneck, num_convs, stride=1, dilation=dilation))
             else:
-                blk.append(BottleneckBlock(in_channels, out_channels, bottleneck, num_convs, stride=2, dilation=dilation))
+                blk.append(block(in_channels, out_channels, bottleneck, num_convs, stride=2, dilation=dilation))
         else:
-            blk.append(BottleneckBlock(out_channels, out_channels, bottleneck, num_convs, stride=1, dilation=dilation))
+            blk.append(block(out_channels, out_channels, bottleneck, num_convs, stride=1, dilation=dilation))
 
     return nn.Sequential(*blk)
 
@@ -1005,6 +1048,48 @@ class LowResCNNViTNoBottleneck(CustomModel):
             transformer
         )
 
+class LowResCNNViTV2(CustomModel):
+    def __init__(self):
+        super(LowResCNNViTV2, self).__init__()
+
+        stem = nn.Sequential(
+            nn.Conv2d(3, 32, kernel_size=7, stride=2, padding=3),
+            nn.ReLU(),
+            nn.BatchNorm2d(32),
+            nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+        )
+
+        b1 = bottleneck_stage(32, 64, 2, 3, 1, maintain_resolution=True, late_norm=True)
+
+        transformer = ClassificationTransformer(embed_size=256, patch_dim=4, num_blocks=4, num_heads=4, mlp_hidden_size=1024, in_channels=64, image_shape=32)
+
+        self._net = nn.Sequential(
+            stem,
+            b1,
+            transformer
+        )
+
+class LowResCNNViTV3(CustomModel):
+    def __init__(self):
+        super(LowResCNNViTV3, self).__init__()
+
+        stem = nn.Sequential(
+            nn.Conv2d(3, 32, kernel_size=7, stride=2, padding=3),
+            nn.ReLU(),
+            nn.BatchNorm2d(32),
+            nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
+        )
+
+        b1 = bottleneck_stage(32, 64, 2, 3, 1, maintain_resolution=True, late_norm=True)
+
+        transformer = ClassificationTransformer(embed_size=512, patch_dim=4, num_blocks=4, num_heads=4, mlp_hidden_size=2048, in_channels=64, image_shape=32)
+
+        self._net = nn.Sequential(
+            stem,
+            b1,
+            transformer
+        )
+
 if __name__ == "__main__":
-    net = LowResCNNViTNoBottleneck()
+    net = LowResCNNViTV3()
     print(net)

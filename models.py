@@ -12,7 +12,9 @@ __all__ = ["AlexNet", "VGG11", "ResNet18", "ResNet34", "ResNet50", "Scope2", "Sc
            "LowResTransformer", "DeepLowResTransformer", "WideLowResTransformer", "DeepWideLowResTransformer","DeeperWideLowResTransformer",
            "WideLowResTransformerV2", "DeepWideLowResTransformerV2", "DeeperWideLowResTransformerV2",
            "CNNViT", "CNNViTNoBottleneck", "LowResCNNViT", "LowResCNNViTNoBottleneck",
-           "LowResCNNViTV2", "LowResCNNViTV3"]
+           "LowResCNNViTV2", "LowResCNNViTV3",
+           "CNNViTNoPatches", "CNNViTNoPatchesV2", "CNNViTNoPatchesV3",
+           "LowResCNNViTNoPatches"]
 
 class CustomModel(nn.Module, ABC):
     """
@@ -25,7 +27,7 @@ class CustomModel(nn.Module, ABC):
         super(CustomModel, self).__init__()
         self._net = None
 
-    def forward(self, x, **kwargs):
+    def forward(self, x):
         return self._net(x)
 
     def __str__(self):
@@ -867,6 +869,42 @@ class ClassificationTransformer(nn.Module):
         else:
             return logits, all_attentions
 
+class ClassificationTransformerNoPatches(nn.Module):
+    def __init__(self, token_length, image_shape, num_blocks, num_heads, mlp_hidden_size, dropout=0.1):
+        super(ClassificationTransformerNoPatches, self).__init__()
+
+        self.cls_token = nn.Parameter(torch.randn(1, 1, token_length))
+
+        num_tokens = image_shape ** 2
+
+        self.position_embeddings = nn.Parameter(
+            torch.randn(1, num_tokens + 1, token_length))  # learned positional encodings
+        self.dropout = nn.Dropout(p=dropout)
+
+        self.num_classes = 200
+        self.encoder = Encoder(num_blocks, token_length, num_heads, mlp_hidden_size, dropout=dropout)
+        self.classifier = nn.Linear(token_length, self.num_classes)
+        self.apply(_init_transformer_weights)
+
+    def forward(self, x, output_attentions=False):
+        x = x.flatten(2).transpose(1, 2)  # B x C x H x W --> B x ((H / embed) * (W / embed)) x C
+
+        batch_size, _, _ = x.size()
+        cls_tokens = self.cls_token.expand(batch_size, -1, -1)  # 1 class token for each image in a batch
+
+        x = torch.cat((cls_tokens, x), dim=1)  # concatenates the class token to the other tokens
+
+        x = x + self.position_embeddings  # adds positional encoding to the image embedding
+        x = self.dropout(x)
+
+        encoder_output, all_attentions = self.encoder(x, output_attentions=output_attentions)
+        logits = self.classifier(encoder_output[:, 0, :])
+
+        if not output_attentions:
+            return logits, None
+        else:
+            return logits, all_attentions
+
 
 class StandardTransformer(CustomModel):
     def __init__(self):
@@ -1090,6 +1128,92 @@ class LowResCNNViTV3(CustomModel):
             transformer
         )
 
+class CNNViTNoPatches(CustomModel):
+    def __init__(self):
+        super(CNNViTNoPatches, self).__init__()
+
+        stem = nn.Sequential(
+            nn.Conv2d(3, 32, kernel_size=7, stride=2, padding=3), # 32 x 64 x 64
+            nn.ReLU(),
+            nn.BatchNorm2d(32),
+            nn.MaxPool2d(kernel_size=3, stride=2, padding=1) # 32 x 32 x 32
+        )
+
+        b1 = bottleneck_stage(32, 64, 2, 3, 1, maintain_resolution=True, late_norm=True) # 64 x 32 x 32
+
+        transformer = ClassificationTransformerNoPatches(64, 32, 4, 4, 1024, 0.1)
+
+        self._net = nn.Sequential(
+            stem,
+            b1,
+            transformer
+        )
+
+class CNNViTNoPatchesV2(CustomModel):
+    def __init__(self):
+        super(CNNViTNoPatchesV2, self).__init__()
+
+        stem = nn.Sequential(
+            nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3), # 64 x 64 x 64
+            nn.ReLU(),
+            nn.BatchNorm2d(64),
+            nn.MaxPool2d(kernel_size=3, stride=2, padding=1) # 64 x 32 x 32
+        )
+
+        b1 = bottleneck_stage(64, 128, 2, 3, 1, maintain_resolution=True, late_norm=True) # 128 x 32 x 32
+
+        transformer = ClassificationTransformerNoPatches(128, 32, 4, 4, 1024, 0.1)
+
+        self._net = nn.Sequential(
+            stem,
+            b1,
+            transformer
+        )
+
+class CNNViTNoPatchesV3(CustomModel):
+    def __init__(self):
+        super(CNNViTNoPatchesV3, self).__init__()
+
+        stem = nn.Sequential(
+            nn.Conv2d(3, 96, kernel_size=7, stride=2, padding=3), # 96 x 64 x 64
+            nn.ReLU(),
+            nn.BatchNorm2d(96),
+            nn.MaxPool2d(kernel_size=3, stride=2, padding=1) # 96 x 32 x 32
+        )
+
+        b1 = bottleneck_stage(96, 256, 2, 3, 1, maintain_resolution=True, late_norm=True) # 256 x 32 x 32
+
+        transformer = ClassificationTransformerNoPatches(256, 32, 4, 4, 2048, 0.1)
+
+        self._net = nn.Sequential(
+            stem,
+            b1,
+            transformer
+        )
+
+class LowResCNNViTNoPatches(CustomModel):
+    def __init__(self):
+        super(LowResCNNViTNoPatches, self).__init__()
+
+        stem = nn.Sequential(
+            nn.Conv2d(3, 32, kernel_size=7, stride=2, padding=3), # 32 x 64 x 64
+            nn.ReLU(),
+            nn.BatchNorm2d(32),
+            nn.MaxPool2d(kernel_size=3, stride=2, padding=1) # 32 x 32 x 32
+        )
+
+        b1 = bottleneck_stage(32, 64, 2, 3, 1, maintain_resolution=True, late_norm=True) # 64 x 32 x 32
+        b2 = bottleneck_stage(64, 128, 2, 3, 1, maintain_resolution=False, late_norm=True) # 128 x 16 x 16
+
+        transformer = ClassificationTransformerNoPatches(128, 16, 4, 4, 1024, 0.1)
+
+        self._net = nn.Sequential(
+            stem,
+            b1,
+            b2,
+            transformer
+        )
+
 if __name__ == "__main__":
-    net = LowResCNNViTV3()
+    net = LowResCNNViTNoPatches()
     print(net)

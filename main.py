@@ -47,8 +47,12 @@ if __name__ == "__main__":
         # (CNNViTNoBottleneck(), 1e-3),
         # (LowResCNNViT(), 1e-3),
         # (LowResCNNViTNoBottleneck(), 1e-3),
-        (LowResCNNViTV2(), 1e-3),
-        (LowResCNNViTV3(), 1e-3),
+        # (LowResCNNViTV2(), 1e-4),
+        # (LowResCNNViTV3(), 1e-4),
+        (CNNViTNoPatches(), 1e-3),
+        (CNNViTNoPatchesV2(), 1e-3),
+        (CNNViTNoPatchesV3(), 1e-3),
+        (LowResCNNViTNoPatches(), 1e-3),
     ]
 
     batch_size = 64
